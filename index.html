@@ -246,12 +246,37 @@
   </main>
 
   <footer class="foot">
-    <div class="wrap" style="display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap">
-      <div>© <span id="year"></span> Lighter Tomorrow</div>
-      <div class="links">
-        <a href="#">Privacy</a>
-        <a href="#">Terms</a>
-        <a href="mailto:hello@lightertomorrow.com">Contact</a>
+    <div class="wrap">
+      <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:24px">
+        <div>© <span id="year"></span> Lighter Tomorrow</div>
+        <div class="links">
+          <a href="#privacy" onclick="togglePrivacy(event)">Privacy</a>
+          <a href="#">Terms</a>
+          <a href="mailto:hello@lightertomorrow.com">Contact</a>
+        </div>
+      </div>
+      
+      <!-- Privacy Disclosure -->
+      <div id="privacy-disclosure" class="privacy-content" style="display:none; max-width:800px; line-height:1.7">
+        <h4 style="margin:0 0 16px; color:var(--ink)">Data Types Collected</h4>
+        
+        <div style="margin-bottom:20px">
+          <h5 style="margin:0 0 8px; color:var(--ink)">Health & Fitness</h5>
+          <p class="muted" style="margin:0 0 8px">User-entered goals, reflections, and habits</p>
+          <p class="muted" style="font-size:14px; margin:0">(e.g., Night Prep checklist, Morning Focus "why," swap choice, End-of-Day notes)</p>
+        </div>
+        
+        <div style="margin-bottom:20px">
+          <h5 style="margin:0 0 8px; color:var(--ink)">Audio (Optional)</h5>
+          <p class="muted" style="margin:0 0 8px">Voice notes if the user chooses to record.</p>
+          <p class="muted" style="font-size:14px; margin:0">By default, audio is not saved — only on-device transcription. Users can enable "Keep Audio" in Settings.</p>
+        </div>
+        
+        <div style="margin-bottom:20px">
+          <h5 style="margin:0 0 8px; color:var(--ink)">Identifiers</h5>
+          <p class="muted" style="margin:0 0 8px">Device ID for iCloud sync only.</p>
+          <p class="muted" style="font-size:14px; margin:0">No advertising IDs or third-party trackers.</p>
+        </div>
       </div>
     </div>
   </footer>
@@ -266,6 +291,14 @@
       btn.classList.add('ok');
       btn.style.background = 'var(--ok)';
       btn.style.boxShadow = '0 8px 20px rgba(43,182,115,.25)';
+    }
+    
+    // Privacy disclosure toggle
+    function togglePrivacy(event) {
+      event.preventDefault();
+      const disclosure = document.getElementById('privacy-disclosure');
+      const isVisible = disclosure.style.display !== 'none';
+      disclosure.style.display = isVisible ? 'none' : 'block';
     }
   </script>
 </body>
