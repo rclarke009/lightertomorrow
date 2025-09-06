@@ -1,9 +1,5 @@
-const { OpenAI } = require('openai');
-
-// Initialize OpenAI with API key from environment
-const openai = new OpenAI({ 
-  apiKey: process.env.OPENAI_API_KEY 
-});
+// Simple OpenAI integration without external dependencies for now
+// We'll use fetch to call OpenAI API directly
 
 exports.handler = async (event, context) => {
   // Handle CORS
@@ -74,20 +70,33 @@ User context: ${userContext || 'New user starting their health journey'}
 
 Respond with empathy, practical advice, and encouragement. Keep responses detailed but focused.`;
 
-    // Call OpenAI API
-    const completion = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
-      messages: [
-        { role: 'system', content: systemPrompt },
-        { role: 'user', content: message.trim() }
-      ],
-      max_tokens: Math.min(maxTokens, 2000),
-      temperature: Math.max(0.1, Math.min(temperature, 2.0)),
-      top_p: 1,
-      frequency_penalty: 0,
-      presence_penalty: 0
+    // Call OpenAI API directly using fetch
+    const openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o-mini',
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: message.trim() }
+        ],
+        max_tokens: Math.min(maxTokens, 2000),
+        temperature: Math.max(0.1, Math.min(temperature, 2.0)),
+        top_p: 1,
+        frequency_penalty: 0,
+        presence_penalty: 0
+      })
     });
 
+    if (!openaiResponse.ok) {
+      const errorData = await openaiResponse.text();
+      throw new Error(`OpenAI API error: ${openaiResponse.status} - ${errorData}`);
+    }
+
+    const completion = await openaiResponse.json();
     const response = completion.choices[0].message.content;
     const usage = completion.usage;
     
