@@ -50,13 +50,37 @@ mini.onSwapLogged()
 
 }
 
-## 13) Inspirational Advice & Onboarding
+## 13) AI Coach Recommendations & Implementation
+
+### Hybrid AI Approach
+
+The app now supports two complementary AI modes to provide flexible, privacy-conscious coaching:
+
+**Online Mode (GPT-4o via OpenAI API):**
+- **Strengths:** Advanced reasoning, multimodal support (text + images), real-time responses
+- **Use Cases:** Complex coaching scenarios, meal analysis via photos, deep emotional support
+- **Privacy:** Data sent to OpenAI servers (requires user consent and API key)
+- **Performance:** 1-2 second response times, requires internet connection
+
+**Private Mode (Apple Foundation Models):**
+- **Strengths:** Complete privacy, offline capability, no data leaves device
+- **Use Cases:** Daily check-ins, habit reminders, basic coaching conversations
+- **Privacy:** All processing on-device via Neural Engine
+- **Performance:** 2-5 second response times, works offline on iPhone 15 Pro+
+
+### Implementation Strategy
+
+1. **Default to Privacy:** Start users in Private mode for privacy-first approach
+2. **Seamless Switching:** Easy toggle in Settings with clear mode indicators
+3. **Context Preservation:** Both modes use same coaching context and prompts
+4. **Fallback Logic:** Auto-switch to Private mode if online unavailable
+5. **Clear Disclaimers:** "This isn't medical advice—consult professionals for mental health/nutrition"
 
 ### Daily Inspirational Advice
 
 Show a short one‑sentence encouragement once per day when the user opens Today.
 
-Examples: “You don’t have to eat perfectly, just make one healthier choice.”, “Water first — let the craving wait 5 minutes.”, “Every prep you do tonight is a gift for your tomorrow self.”
+Examples: "You don't have to eat perfectly, just make one healthier choice.", "Water first — let the craving wait 5 minutes.", "Every prep you do tonight is a gift for your tomorrow self."
 
 Implementation: cycle through a small local array of phrases by date hash.
 
@@ -134,21 +158,82 @@ PDF export of weekly reflections.
 
 “Emergency plan” button that surfaces your top 3 swaps and a 90‑second calming audio.
 
-## 14) Next Steps (Concrete)
+## 14) AI Implementation Guide
 
-Create Xcode project (iOS 17+), add SwiftData model from §4.
+### Quick Setup Comparison
 
-Build TodayView from §6 and verify save/load for current day.
+| Aspect | Online (GPT-4o) | Private (Apple Foundation Models) |
+|--------|-----------------|-----------------------------------|
+| **Setup Time** | 10-20 min + API key | 5-10 min (built-in) |
+| **Dependencies** | OpenAI Swift Package | None (iOS 18+ native) |
+| **Performance** | 1-2s response time | 2-5s on-device |
+| **Privacy** | Data sent to OpenAI | Complete on-device |
+| **Cost** | Usage-based | Free |
+| **Requirements** | Internet + API key | iPhone 15 Pro+ |
 
-Add two local notifications for Night Prep and Morning Focus.
+### Implementation Steps
 
-Implement MockLLM and chat UI scaffold; confirm interface.
+#### Online Mode (GPT-4o)
+1. **Add Dependency:** `https://github.com/MacPaw/OpenAI` Swift package
+2. **API Key Setup:** Secure storage in Keychain, never hardcode
+3. **Service Class:** `OnlineCoachingService` with GPT-4o integration
+4. **Privacy Consent:** Clear user agreement before enabling
+5. **Error Handling:** Graceful fallback to Private mode
 
-Choose model path (llama.cpp or MLC‑LLM) and budget app size.
+#### Private Mode (Apple Foundation Models)
+1. **Framework Import:** `FoundationModels` and `CoreML`
+2. **Model Loading:** Use `LanguageModel.default` for optimized performance
+3. **Service Class:** `PrivateCoachingService` with on-device processing
+4. **Performance Tuning:** Optimize for iPhone 15 Pro+ Neural Engine
+5. **Offline Testing:** Ensure functionality without internet
 
-Add voice capture with file storage; add optional transcription.
+#### Hybrid Manager
+1. **Unified Interface:** `HybridLLMManager` coordinating both services
+2. **Mode Switching:** Seamless transitions with chat history management
+3. **Settings Integration:** Clear UI for mode selection and status
+4. **Fallback Logic:** Auto-switch based on connectivity and user preference
+5. **Context Sharing:** Both modes use same coaching context and prompts
 
-When you’re ready, we can drop in a real LLM adapter—your UI won’t have to change.
+### Prompt Engineering
+
+**System Prompt (Both Modes):**
+```
+You are a compassionate, pragmatic weight-loss coach. Focus on sustainable healthy decisions, addressing mental health triggers (anxiety-driven snacking) and bad habits using CBT-inspired techniques. Include basic nutrition guidance but prioritize mindset and emotional support. Use the user's daily context (why, chosen swap, commitment). Avoid shame. Offer one concrete next step. Keep replies under 200 words unless asked. End with an engaging question.
+```
+
+**Context Integration:**
+- Daily "My Why" motivation
+- Chosen habit swaps
+- Current streak information
+- Weekly progress data
+- Recent craving patterns
+
+## 15) Next Steps (Concrete)
+
+**Phase 1 - Foundation:**
+- Create Xcode project (iOS 18+), add SwiftData model
+- Build TodayView with save/load functionality
+- Add local notifications for Night Prep and Morning Focus
+
+**Phase 2 - AI Integration:**
+- Implement Private mode (Apple Foundation Models) first
+- Add Online mode (GPT-4o) with secure API management
+- Create hybrid switching with seamless transitions
+- Add comprehensive privacy disclaimers
+
+**Phase 3 - Advanced Features:**
+- Voice capture with optional transcription
+- Multimodal support (image analysis for meals)
+- Advanced coaching prompts with CBT techniques
+- Context-aware responses using daily entry data
+
+**Phase 4 - Polish:**
+- Settings UI for AI mode management
+- Error handling and fallback logic
+- Performance optimization and testing
+- User onboarding for AI features
+
+When you're ready, the hybrid approach allows seamless switching between modes—your UI won't need to change when switching between Private and Online AI.
 
 ## 9.1 Deep‑Link Routing & Navigation Hooks
 
@@ -283,3 +368,8 @@ Sound or haptics settings: soft success haptic on nightly; fuller success on mi
 Theme tie-in: color the leaves with your brand greens/teals; add a tiny dew-sparkle when the sway reverses for a micro-delight.
 
 If you want, I can swap the leaf shape to something more stylized (e.g., rounded teardrops), or turn the sprout into a small potted sapling that gets a new leaf at certain totals (e.g., every 5 swaps).
+
+Notes:
+
+Needs to refresh even if it’s open based on the current time.  So if user has app in background and then looks at it again it should refresh the data (i opened it and saw yesterday’s morning data and had to close app and reopen to see today’s blanks so I could use them)
+

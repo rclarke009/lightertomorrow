@@ -1,0 +1,43 @@
+let’s add a lightweight, joyful Success Capture flow that mirrors your “I Need Help” flow but for wins. Below is a drop-in spec + SwiftUI scaffolding so you can wire it up quickly.
+Success Capture — Product Slice
+Why: Reinforce positive behavior, let users “bank” wins in the same place they process struggles. Where: Add a big button on Today (parallel to “I Need Help”) and a compact tile in End-of-Day. What: One-tap categories + quick text/voice, then your mini-celebration.
+
+
+
+capturing successes is a natural complement to capturing struggles or cravings.
+Your current plan already has structured celebrations (sprout animation, milestone overlays, encouragement lines), and the data model already supports voice/text notes. Extending this to let the user log “I did great!” moments makes sense:
+•	Button/Trigger: A large “✨ I Did Great!” button (parallel to “I Need Help”).
+•	Capture Modal: Quick choice of text or voice note (stored same way as craving captures).
+•	Encouragement Layer: Trigger the sprout/confetti celebration flow right after saving.
+•	History View: Show these successes in the same scroll/list as cravings, with a filter or tag (e.g., “Success” vs. “Help”).
+	•		•	Future AI Use: Later, your coach can highlight patterns like “Notice how your best days often follow prepping water the night before.”
+
+
+History integration
+•	History tab: Add a “Wins” segment to filter the list or show a sub-section under each date:
+•	Successes (2) → bulleted list of the day’s success texts; show the chip label as a caption.
+•	If audioURL != nil, show a tiny play button (inline audio player).
+•	Heatmap (if you’re showing one): count any day with 1+ successes as a “hit.”
+•	Weekly ring: bump the ring the same way a Night Prep or Morning Focus does.
+Coach tie-ins (optional now, easy later)
+Add to CoachContext:
+
+var recentSuccess: String?   // e.g., most recent note.text
+var successType: String?     // SuccessType.rawValue
+var successCount7d: Int
+Then sprinkle a one-line nudge: “Nice job logging wins—3 this week. What helped you most yesterday?”
+Settings
+•	Celebrations: Already in your plan—leave as is, just reuse for wins.
+•	Audio policy: Default off (private, lightweight). Toggle “Keep audio with wins,” mirrors your voice-note policy.
+•	Show ‘I Did Great!’ on Today: toggle for minimalists (default on).
+Accessibility
+•	Large tap targets, VoiceOver labels read the selected chip (“Selected: Water first”).
+•	Respect Reduce Motion for record pulsing and celebration sway.
+QA checklist
+•	Can save with just one tap (chip preselected) + Save.
+•	Voice record stops on backgrounding or sheet dismiss.
+•	Celebration runs once on save; never on cancel.
+•	Success shows immediately in Today (tiny “Win saved” toast) and appears in History.
+
+If you want, I can also provide a tiny FlowLayout implementation for the chips and a super-simple AudioRecorder helper you can drop in—just say the word and I’ll paste them in.
+

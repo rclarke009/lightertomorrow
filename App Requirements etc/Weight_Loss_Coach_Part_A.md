@@ -32,13 +32,18 @@ Quick Capture
 
 Large button: “I’m craving / I’m stressed” → opens a 20-second voice note + prompt to choose a swap.
 
-Coach Chat (Local LLM)
+Coach Chat (Hybrid AI)
 
-Simple chat UI.
+Simple chat UI with seamless mode switching.
 
-On-device model with system prompt tuned to your goals.
+**Online Mode:** GPT-4o with advanced reasoning and multimodal support
+**Private Mode:** Apple Foundation Models with complete privacy
 
-Can reference today’s entry (your why, chosen swap) when replying.
+Both modes use system prompts tuned to weight loss coaching goals.
+
+Can reference today's entry (your why, chosen swap) when replying.
+
+Includes comprehensive disclaimers: "This isn't medical advice—consult professionals for mental health/nutrition."
 
 Reminders & Widgets
 
@@ -60,15 +65,28 @@ Persistence: SwiftData (iOS 17+) or Core Data fallback if needed.
 
 Speech: SFSpeechRecognizer with supportsOnDeviceRecognition == true when available; otherwise standard path.
 
-LLM (choose 1 to start, keep interface swappable):
+AI Coach Implementation (Hybrid Approach):
 
-Option A — llama.cpp (Metal backend). Ship a small quantized model (e.g., 1.5–3B) as an in-app resource or downloadable asset.
+**Online Option — GPT-4o via OpenAI API:**
+- Scalable, powerful conversations with real-time responses
+- Supports multimodal input (text + images for meal analysis)
+- Advanced reasoning for complex coaching scenarios
+- Requires internet connection and API key
+- Privacy consideration: Data sent to OpenAI servers
 
-Option B — MLC-LLM (TVM): iOS-friendly runtime with Metal acceleration and model packs.
+**Private Option — Apple Foundation Models (iOS 18+):**
+- On-device processing via Neural Engine
+- Complete privacy - no data leaves device
+- Works offline without internet connection
+- Optimized for iPhone 15 Pro+ devices
+- Uses Core ML and FoundationModels framework
 
-Option C — System Intelligence (when available): If future iOS exposes sanctioned on-device models via API, you can add an adapter.
-
-Create a LocalLLMService protocol so you can swap implementations without touching UI.
+**Implementation Strategy:**
+- Provide both options in Settings with easy switching
+- Default to private mode for privacy-first users
+- Allow fallback to online mode for complex queries
+- Create a unified LLMService protocol for seamless switching
+- Include comprehensive privacy disclaimers and user consent
 
 ## 4) Data Model (SwiftData)
 
@@ -692,12 +710,14 @@ struct EndOfDaySection: View {
     }
 }
 
-## 7) Coach Chat (Local LLM) – Interfaces
+## 7) Coach Chat (Hybrid AI) – Interfaces
 
 ### Abstraction
 
-protocol LocalLLMService {
+protocol LLMService {
+    var isOnlineMode: Bool { get }
     func generateReply(to messages: [LLMMessage], context: CoachContext) async throws -> String
+    func switchMode() async
 }
 
 struct LLMMessage: Identifiable, Codable {
@@ -706,6 +726,7 @@ struct LLMMessage: Identifiable, Codable {
     var role: Role
     var content: String
     var timestamp: Date = .now
+    var includesImage: Bool = false
 }
 
 struct CoachContext: Codable {
@@ -713,40 +734,93 @@ struct CoachContext: Codable {
     var todaySwap: String
     var commitTo: String
     var commitFrom: String
+    var currentStreak: Int = 0
+    var daysThisWeek: Int = 0
 }
 
-### System Prompt (first message)
+### System Prompt (Both Modes)
 
-You are a compassionate, pragmatic weight-loss coach. Focus on tiny, doable actions and pattern awareness.
-Use the user’s daily context (why, chosen swap, commitment). Avoid shame. Offer one concrete next step.
-Keep replies under 120 words unless asked.
+You are a compassionate, pragmatic weight-loss coach. Focus on sustainable healthy decisions, addressing mental health triggers (anxiety-driven snacking) and bad habits using CBT-inspired techniques. Include basic nutrition guidance but prioritize mindset and emotional support. Use the user's daily context (why, chosen swap, commitment). Avoid shame. Offer one concrete next step. Keep replies under 200 words unless asked. End with an engaging question.
 
-### Mock Implementation (for development)
+### Online Implementation (GPT-4o)
 
-final class MockLLM: LocalLLMService {
+final class OnlineCoachingService: LLMService {
+    var isOnlineMode: Bool = true
+    private let openAI: OpenAI.Client
+    
     func generateReply(to messages: [LLMMessage], context: CoachContext) async throws -> String {
-        let last = messages.last?.content ?? ""
-        return "I hear you. Given your commitment to \(context.commitTo) instead of \(context.commitFrom), try one tiny step: drink water and set a 5‑minute timer before deciding. What feels doable right now about: \(last.prefix(80))…?"
+        let systemPrompt = createSystemPrompt(context: context)
+        let chatMessages = [ChatMessage.role(.system, content: .string(systemPrompt))] + 
+                          messages.map { ChatMessage.role(.user, content: .string($0.content)) }
+        
+        let query = ChatQuery(model: .gpt4_o, messages: chatMessages)
+        let result = try await openAI.chats(query: query)
+        return result.choices.first?.message.content ?? "Sorry, please try again."
+    }
+    
+    func switchMode() async {
+        // Switch to private mode implementation
     }
 }
 
-### Hooking Up a Real On‑Device Model
+### Private Implementation (Apple Foundation Models)
 
-llama.cpp route
+final class PrivateCoachingService: LLMService {
+    var isOnlineMode: Bool = false
+    private let model: LanguageModel
+    
+    func generateReply(to messages: [LLMMessage], context: CoachContext) async throws -> String {
+        let systemPrompt = createSystemPrompt(context: context)
+        let conversation = messages.map { "\($0.role.rawValue): \($0.content)" }.joined(separator: "\n")
+        
+        let prompt = """
+        \(systemPrompt)
+        
+        Conversation:
+        \(conversation)
+        
+        Coach:
+        """
+        
+        let session = model.startSession()
+        let request = GenerateTextRequest(
+            prompt: prompt,
+            options: GenerateTextOptions(maxTokens: 300, temperature: 0.7)
+        )
+        
+        let response = try await session.generateText(request)
+        return response.content.text ?? "Sorry, please try again."
+    }
+    
+    func switchMode() async {
+        // Switch to online mode implementation
+    }
+}
 
-Add a dependency (static library or Swift Package) that exposes a simple predict(prompt: String) Metal-accelerated call.
+### Hybrid Manager
 
-Bundle a small quantized model (e.g., 2–4 GB can be too large; consider 1–2 GB or offer in‑app download after consent).
-
-Stream tokens and surface partial text in the UI.
-
-MLC-LLM route
-
-Integrate its iOS runtime and select a compact model variant.
-
-Use Metal for GPU acceleration on device; control context length/token limits to protect battery.
-
-App Store note: if you download models post‑install, present clear consent and allow deletion in Settings.
+final class HybridLLMManager: ObservableObject, LLMService {
+    @Published var isOnlineMode: Bool = false
+    @AppStorage("preferOnlineAI") private var preferOnlineAI = false
+    
+    private let onlineService = OnlineCoachingService()
+    private let privateService = PrivateCoachingService()
+    
+    var currentService: LLMService {
+        isOnlineMode ? onlineService : privateService
+    }
+    
+    func generateReply(to messages: [LLMMessage], context: CoachContext) async throws -> String {
+        return try await currentService.generateReply(to: messages, context: context)
+    }
+    
+    func switchMode() async {
+        await MainActor.run {
+            isOnlineMode.toggle()
+            preferOnlineAI = isOnlineMode
+        }
+    }
+}
 
 ## 8) Speech – Private Voice Notes
 
@@ -889,13 +963,25 @@ struct TodayView: View {
 
 This ensures tapping a reminder routes the user straight to the right section (or opens Need Help sheet).
 
-## 10) Settings) Settings
+## 10) Settings
 
-iCloud Sync (SwiftData + CloudKit) toggle.
+### AI Coach Configuration
+- **AI Mode Selection:** Toggle between Online (GPT-4o) and Private (Apple Foundation Models)
+- **Privacy Controls:** Clear chat history when switching modes
+- **API Key Management:** Secure storage for OpenAI API key (Online mode only)
+- **Model Status:** Display current AI mode and connection status
+- **Fallback Behavior:** Auto-switch to private mode if online unavailable
 
-Model Management: choose installed model; show size; delete model.
+### Data & Privacy
+- **iCloud Sync:** SwiftData + CloudKit toggle (off by default for privacy)
+- **Data Export:** JSON export of entries for backup/restore
+- **Chat History:** Option to keep or auto-delete conversation history
+- **Privacy Disclaimers:** Clear information about data handling per mode
 
-Export: JSON export of entries; Import for restore.
+### Notifications & Reminders
+- **Reminder Times:** Customize evening prep and morning focus notifications
+- **Notification Content:** Preview and customize reminder messages
+- **Deep Link Testing:** Test notification routing to specific app sections
 
 ## 12) Gamification & Motivation
 
@@ -1009,13 +1095,23 @@ Button: Reset achievements (with confirm).
 
 ## 11) Phased Build Plan
 
-Phase 0 (Day 1–2) - Project setup, SwiftData model, TodayView skeleton, local saves.
+**Phase 0 (Day 1–2)** - Project setup, SwiftData model, TodayView skeleton, local saves.
 
-Phase 1 - Night Prep + Morning Focus + End-of-Day fully working. - Notifications for Night/Morning. - History list & detail.
+**Phase 1** - Night Prep + Morning Focus + End-of-Day fully working. - Notifications for Night/Morning. - History list & detail.
 
-Phase 2 - Quick Capture voice notes; optional transcription. - Widgets.
+**Phase 2** - Quick Capture voice notes; optional transcription. - Widgets.
 
-Phase 3 - Coach Chat using MockLLM → swap to real on-device model via llama.cpp or MLC‑LLM. - Settings: model management, iCloud sync.
+**Phase 3** - AI Coach Implementation:
+  - Start with Private mode (Apple Foundation Models) for privacy-first approach
+  - Add Online mode (GPT-4o) with secure API key management
+  - Implement hybrid switching with seamless mode transitions
+  - Add comprehensive privacy disclaimers and user consent flows
+
+**Phase 4** - Advanced AI Features:
+  - Multimodal support (image analysis for meal logging)
+  - Advanced coaching prompts with CBT techniques
+  - Context-aware responses using daily entry data
+  - Settings: AI mode management, privacy controls, iCloud sync
 
 ## 12) Design Notes
 
