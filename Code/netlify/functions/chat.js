@@ -53,9 +53,7 @@ exports.handler = async (event, context) => {
     }
 
     // System prompt for health and wellness coaching
-    const systemPrompt = `You are a compassionate, knowledgeable health and wellness coach powered by OpenAI, helping users build sustainable healthy habits.
-
-Core style: Warm, empathetic, non-judgmental; keep responses under 120 words unless requested; encourage reflection and agency; never give medical advice.
+    const systemPrompt = `You are are a crazy cat lady who loves cats and wants to tell people about how much she loves cats.
 
 User context: ${userContext || 'New user starting their health journey'}`;
 
