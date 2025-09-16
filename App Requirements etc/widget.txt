@@ -1,0 +1,250 @@
+awesome—here’s a clean, shippable **“Daily Wisdom” widget** concept you can drop into WidgetKit. I’ll show the layouts first (what each size looks like), then a concise code scaffold you can paste in.
+
+# Widget layouts (at a glance)
+
+**Design language:** big, legible type; calm background; tiny sprout/quote-mark icon; 1-tap deep link to open the app (and optionally show the full quote history or “I Need Help”).
+
+### Small (System Small)
+
+* **Top-left:** subtle icon (sprout or quotes)
+* **Center:** 1–2 lines of the advice (max \~50–65 chars)
+* **Footer (optional):** “— someone who’s been there” in footnote
+* Tap → deep link `wlcoach://reviewPrep`
+
+```
+[ 🌱 ]  Cravings crest and fall.
+       Breathe, then choose.
+       — someone who’s been there
+```
+
+### Medium (System Medium)
+
+* **Left:** sprout illustration (24–32pt) or a soft gradient badge
+* **Right:** advice in larger title3/headline, up to 3 lines
+* **Bottom-right chip (optional):** “Open Coach” cue
+* Tap → deep link `wlcoach://reviewPrep` (or configurable)
+
+```
+[  🌱  ]  You don’t have to win the day —
+          just the next choice.
+
+          Open Coach ⟶
+```
+
+### Large (System Large)
+
+* **Header row:** “Daily Wisdom” + tiny date
+* **Body:** large quote block (title2) with comfortable margins
+* **Footer:** “Tonight: Prep water + snack” (pulls last Night Prep items)
+* Tap → deep link `wlcoach://reviewPrep`
+
+```
+Daily Wisdom · Wed, Sep 3
+“Make the healthy thing the easy thing.”
+
+Tonight: Put water by the bed · Move protein to eye level
+```
+
+### Lock Screen widgets (iOS 16+)
+
+* **AccessoryInline:** short version: `🌱 One choice at a time.`
+* **AccessoryRectangular:** 1–2 lines of advice; smaller icon
+
+---
+
+# Implementation scaffold (WidgetKit, SwiftUI)
+
+> This is intentionally compact and production-safe. It rotates advice once per day, respects your existing `AdviceManager` rotationIndex (or its own), and deep-links on tap.
+
+```swift
+import WidgetKit
+import SwiftUI
+
+// MARK: - Model
+
+struct WisdomEntry: TimelineEntry {
+    let date: Date
+    let advice: String
+    let deeplink: URL
+}
+
+private let advicePool = [
+    "Cravings crest and fall. Breathe, then choose.",
+    "You don’t have to win the day—just the next choice.",
+    "Water first. Let the urge wait five minutes.",
+    "Make the healthy thing the easy thing.",
+    "If you slip, step back in on the very next bite.",
+    "Night prep is tomorrow’s willpower.",
+    "Move 60 seconds. It changes the channel.",
+    "Be kind to yourself; consistency beats intensity."
+]
+
+// Simple rotation: index by day-of-year so all devices match without sync.
+private func adviceForToday(_ date: Date = .now) -> String {
+    let day = Calendar.current.ordinality(of: .day, in: .year, for: date) ?? 1
+    return advicePool[(day - 1) % advicePool.count]
+}
+
+// MARK: - Provider
+
+struct WisdomProvider: TimelineProvider {
+    func placeholder(in context: Context) -> WisdomEntry {
+        .init(date: Date(), advice: "One choice at a time.", deeplink: URL(string: "wlcoach://reviewPrep")!)
+    }
+
+    func getSnapshot(in context: Context, completion: @escaping (WisdomEntry) -> Void) {
+        completion(.init(date: Date(), advice: adviceForToday(), deeplink: URL(string: "wlcoach://reviewPrep")!))
+    }
+
+    func getTimeline(in context: Context, completion: @escaping (Timeline<WisdomEntry>) -> Void) {
+        let now = Date()
+        // Next refresh: just after midnight local time
+        var comps = Calendar.current.dateComponents([.year, .month, .day], from: now)
+        comps.day = (comps.day ?? 1) + 1
+        let midnight = Calendar.current.date(from: comps) ?? now.addingTimeInterval(60*60*24)
+
+        let entry = WisdomEntry(date: now,
+                                advice: adviceForToday(now),
+                                deeplink: URL(string: "wlcoach://reviewPrep")!)
+        completion(Timeline(entries: [entry], policy: .after(midnight)))
+    }
+}
+
+// MARK: - Views
+
+struct WisdomSmallView: View {
+    let entry: WisdomEntry
+    var body: some View {
+        ZStack(alignment: .topLeading) {
+            // soft background that adapts to light/dark
+            ContainerRelativeShape()
+                .fill(Color(.systemBackground))
+            VStack(alignment: .leading, spacing: 6) {
+                Image(systemName: "quote.opening")
+                    .imageScale(.medium)
+                    .opacity(0.7)
+                Text(entry.advice)
+                    .font(.headline)           // auto scales
+                    .minimumScaleFactor(0.8)
+                    .lineLimit(3)
+                Text("— someone who’s been there")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
+                    .padding(.top, 2)
+            }
+            .padding(12)
+        }
+        .widgetURL(entry.deeplink)
+    }
+}
+
+struct WisdomMediumView: View {
+    let entry: WisdomEntry
+    var body: some View {
+        HStack(spacing: 12) {
+            ZStack {
+                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                    .fill(Color.teal.opacity(0.15))
+                Image(systemName: "leaf.fill")
+                    .font(.system(size: 28, weight: .semibold))
+                    .foregroundStyle(.teal)
+            }
+            .frame(width: 64, height: 64)
+
+            VStack(alignment: .leading, spacing: 6) {
+                Text(entry.advice)
+                    .font(.title3.weight(.semibold))
+                    .lineLimit(3)
+                    .minimumScaleFactor(0.85)
+                Text("Open Coach ⟶")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+            }
+            Spacer(minLength: 0)
+        }
+        .padding(14)
+        .background(ContainerRelativeShape().fill(Color(.systemBackground)))
+        .widgetURL(entry.deeplink)
+    }
+}
+
+struct WisdomLargeView: View {
+    let entry: WisdomEntry
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                Text("Daily Wisdom")
+                    .font(.headline)
+                Spacer()
+                Text(entry.date.formatted(date: .abbreviated, time: .omitted))
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+            }
+            Text("“\(entry.advice)”")
+                .font(.title2.weight(.semibold))
+                .lineSpacing(2)
+                .minimumScaleFactor(0.9)
+
+            Divider().opacity(0.3)
+
+            // Optional tie-in (pull from shared defaults if available)
+            Text("Tonight: Put water by the bed · Move protein to eye level")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+                .lineLimit(2)
+        }
+        .padding(16)
+        .background(ContainerRelativeShape().fill(Color(.systemBackground)))
+        .widgetURL(entry.deeplink)
+    }
+}
+
+// MARK: - Widget
+
+struct WisdomWidget: Widget {
+    var body: some WidgetConfiguration {
+        StaticConfiguration(kind: "WisdomWidget", provider: WisdomProvider()) { entry in
+            switch WidgetFamily.current {
+            case .systemSmall:
+                WisdomSmallView(entry: entry)
+            case .systemMedium:
+                WisdomMediumView(entry: entry)
+            case .systemLarge:
+                WisdomLargeView(entry: entry)
+            case .accessoryInline:
+                Text("🌱 " + entry.advice)
+                    .widgetURL(entry.deeplink)
+            case .accessoryRectangular:
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Daily Wisdom").font(.caption).foregroundStyle(.secondary)
+                    Text(entry.advice).lineLimit(2)
+                }
+                .widgetURL(entry.deeplink)
+            default:
+                WisdomSmallView(entry: entry)
+            }
+        }
+        .configurationDisplayName("Daily Wisdom")
+        .description("See one encouraging line each day.")
+        .supportedFamilies([.systemSmall, .systemMedium, .systemLarge, .accessoryInline, .accessoryRectangular])
+    }
+}
+
+@main
+struct WisdomWidgetBundle: WidgetBundle {
+    var body: some Widget {
+        WisdomWidget()
+    }
+}
+```
+
+## Options & polish
+
+* **Theme modes:** swap the icon to your sprout asset; tint with your brand teal/green.
+* **Deep links:** choose destination per family (e.g., large → `wlcoach://prepTonight`, medium/small → `wlcoach://reviewPrep`).
+* **Rotation source:** if you already have `AdviceManager` + App Group, read `rotationIndex` from shared defaults so the widget and app stay in sync.
+* **Refresh cadence:** daily at midnight is plenty; if you want time-of-day variants (morning vs afternoon nudge), add two entries per day at 8am & 2pm.
+* **Accessibility:** large dynamic type is handled by system fonts; all text has sufficient contrast on systemBackground.
+
+Want me to tweak the **visual style** (e.g., rounded “quote card” with subtle linen texture, or a gradient halo behind the sprout) to match your current palette?

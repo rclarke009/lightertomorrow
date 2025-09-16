@@ -41,8 +41,9 @@
       border-bottom:1px solid rgba(13,73,110,.08);
     }
     .nav{display:flex; align-items:center; justify-content:space-between; padding:14px 0}
+    .nav > div:last-child{margin-right:12px}
     .brand{display:flex; align-items:center; gap:12px}
-    .logo{width:36px; height:36px; border-radius:9px; box-shadow: var(--shadow)}
+    .logo{width:36px; height:36px; border-radius:9px; box-shadow: var(--shadow); margin-left:12px}
     .brand h1{font-size:18px; margin:0}
     .nav a.btn{margin-left:12px}
 
@@ -59,16 +60,6 @@
     .hero p{font-size:clamp(16px, 2vw, 18px); color:var(--muted); margin:0 0 18px}
     .note{display:inline-flex; align-items:center; gap:8px; background:#e8f6ff; color:#0d4b6e; padding:6px 12px; border-radius:999px; font-weight:600}
     .hero-card{background:var(--paper); border-radius:var(--radius-lg); box-shadow:var(--shadow); padding:22px}
-    .phone{width:100%; aspect-ratio: 10/19; border-radius:26px; background: radial-gradient(120% 120% at 0% 0%, #e9f7ff, #e7fbf2 60%, #fff 100%); border:10px solid #111; position:relative; overflow:hidden}
-    .screen{position:absolute; inset:12px; border-radius:18px; background:white; box-shadow: inset 0 0 0 1px rgba(0,0,0,.04)}
-    .spark{position:absolute; width:9px; height:9px; border-radius:50%; background:conic-gradient(from 0deg,#7fd3ff,#2bb673,#7fd3ff); animation:spark 2.8s linear infinite}
-    @keyframes spark { to { transform: rotate(1turn) translate(120px) rotate(-1turn) } }
-    .sprout{position:absolute; bottom:20px; left:50%; transform:translateX(-50%); width:120px; height:120px}
-    .sprout .stem{position:absolute; bottom:0; left:50%; width:6px; height:70px; background:linear-gradient(#2bb673,#0e8c54); border-radius:999px; transform:translateX(-50%)}
-    .sprout .leaf{position:absolute; bottom:50px; width:46px; height:26px; background:radial-gradient(120% 120% at 10% 10%, #9be3bf, #2bb673); border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%; animation:wave 2.4s ease-in-out infinite}
-    .sprout .leaf.left{left:50%; transform-origin:right bottom; transform: translate(-56%, 0) rotate(-18deg)}
-    .sprout .leaf.right{left:50%; transform-origin:left bottom; transform: translate(10%, 0) rotate(18deg); animation-delay:1.2s}
-    @keyframes wave { 0%,100%{ transform:translateX(0) rotate(0deg)} 50%{ transform:translateX(2px) rotate(4deg)} }
 
     /* SECTIONS */
     section{padding:64px 0}
@@ -133,16 +124,8 @@
         </div>
 
         <div class="hero-card" aria-label="App preview">
-          <div class="phone" role="img" aria-label="Animated celebration and sprout">
-            <div class="screen"></div>
-            <div class="spark" style="top:50%; left:50%"></div>
-            <div class="sprout" aria-hidden="true">
-              <div class="stem"></div>
-              <div class="leaf left"></div>
-              <div class="leaf right"></div>
-            </div>
-          </div>
-          <p class="muted" style="margin:12px 2px 0">Tiny wins get tiny celebrations. Keep a 3‑ or 7‑day streak to unlock bigger moments ✨</p>
+          <img src="images/lighter-tomorrow-weightloss-coach-app-welcome.png" alt="Lighter Tomorrow App Welcome Screen" style="width:100%; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.1);">
+          <p class="muted" style="margin:12px 2px 0">Start your journey with gentle guidance and celebrate every small win along the way ✨</p>
         </div>
       </div>
     </section>
@@ -188,7 +171,7 @@
             <div class="dot">3</div>
             <div>
               <h3>Tap “I did my swap”</h3>
-              <p class="muted">Enjoy a small celebration. Streaks unlock special animations.</p>
+              <p class="muted">Enjoy a celebration. Watch your streak grow and feel the progress.</p>
             </div>
           </div>
         </div>
@@ -207,7 +190,7 @@
           <div class="muted" style="margin-top:8px">— Early user</div>
         </blockquote>
         <blockquote class="card">
-          “Bite by bite feels doable. I’ve kept a 14‑day streak for the first time in years.”
+          “Bite by bite, this feels doable. I’ve kept a 14‑day streak for the first time in years.”
           <div class="muted" style="margin-top:8px">— Tester</div>
         </blockquote>
       </div>
