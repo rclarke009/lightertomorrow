@@ -203,10 +203,10 @@
           <h3>Be first to know when we launch</h3>
           <p class="muted" style="margin:6px 0 0">Join the waitlist for early access and a founder‑member perk.</p>
         </div>
-        <form action="#" method="post" onsubmit="event.preventDefault(); subscribed();">
+        <form id="mailerlite-form" onsubmit="handleMailerLiteSubmit(event);">
           <label class="visually-hidden" for="email">Email</label>
           <input id="email" type="email" name="email" placeholder="you@example.com" required />
-          <button class="btn primary" type="submit">Join waitlist</button>
+          <button class="btn primary" type="submit">Notify me</button>
         </form>
       </div>
     </section>
@@ -303,6 +303,45 @@
     // Set current year
     document.getElementById('year').textContent = new Date().getFullYear();
     // Fake subscribe handler
+    async function handleMailerLiteSubmit(event) {
+      event.preventDefault();
+      
+      const btn = document.querySelector('button[type=submit]');
+      const email = document.getElementById('email').value;
+      
+      btn.textContent = 'Submitting...';
+      btn.disabled = true;
+      
+      try {
+        const response = await fetch('/.netlify/functions/subscribe', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            email: email
+          })
+        });
+        
+        const result = await response.json();
+        
+        if (response.ok && result.success) {
+          btn.textContent = 'You\'re on the list!';
+          btn.classList.add('ok');
+          btn.style.background = 'var(--ok)';
+          btn.style.boxShadow = '0 8px 20px rgba(43,182,115,.25)';
+          document.getElementById('email').value = '';
+        } else {
+          throw new Error(result.error || 'Subscription failed');
+        }
+      } catch (error) {
+        btn.textContent = 'Try again';
+        btn.disabled = false;
+        console.error('Error:', error);
+        alert('Sorry, there was an error. Please try again.');
+      }
+    }
+    
     function subscribed(){
       const btn = document.querySelector('button[type=submit]');
       btn.textContent = 'You’re on the list!';
