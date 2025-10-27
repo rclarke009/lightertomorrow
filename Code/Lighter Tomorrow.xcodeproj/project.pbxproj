@@ -31,6 +31,7 @@
 		A99BF8EB2E91D29100CE8411 /* requirement tweaks.md in Resources */ = {isa = PBXBuildFile; fileRef = A99BF8EA2E91D27C00CE8411 /* requirement tweaks.md */; };
 		A99BFB092EA488C300CE8411 /* emotion pattern feature.md in Resources */ = {isa = PBXBuildFile; fileRef = A99BFB082EA488A900CE8411 /* emotion pattern feature.md */; };
 		A99BFB0B2EA48A5000CE8411 /* habit fix.md in Resources */ = {isa = PBXBuildFile; fileRef = A99BFB0A2EA48A5000CE8411 /* habit fix.md */; };
+		A9ED46122EAEB97200A66D28 /* CoacherWatch Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = A9ED45F22EAEB97100A66D28 /* CoacherWatch Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -55,6 +56,27 @@
 			remoteGlobalIDString = A9ACE3AD2E63EB0A00BB3ADD;
 			remoteInfo = Coacher;
 		};
+		A9ED45FF2EAEB97200A66D28 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A9ACE3A62E63EB0A00BB3ADD /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A9ED45F12EAEB97100A66D28;
+			remoteInfo = "CoacherWatch Watch App";
+		};
+		A9ED46092EAEB97200A66D28 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A9ACE3A62E63EB0A00BB3ADD /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A9ED45F12EAEB97100A66D28;
+			remoteInfo = "CoacherWatch Watch App";
+		};
+		A9ED46102EAEB97200A66D28 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A9ACE3A62E63EB0A00BB3ADD /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A9ED45F12EAEB97100A66D28;
+			remoteInfo = "CoacherWatch Watch App";
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -75,6 +97,7 @@
 			dstPath = "$(CONTENTS_FOLDER_PATH)/Watch";
 			dstSubfolderSpec = 16;
 			files = (
+				A9ED46122EAEB97200A66D28 /* CoacherWatch Watch App.app in Embed Watch Content */,
 			);
 			name = "Embed Watch Content";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -95,6 +118,9 @@
 		A9ACE3AE2E63EB0A00BB3ADD /* Lighter Tomorrow.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Lighter Tomorrow.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		A9ACE3C02E63EB0B00BB3ADD /* Lighter TomorrowTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Lighter TomorrowTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		A9ACE3CA2E63EB0B00BB3ADD /* Lighter TomorrowUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Lighter TomorrowUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		A9ED45F22EAEB97100A66D28 /* CoacherWatch Watch App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "CoacherWatch Watch App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		A9ED45FE2EAEB97200A66D28 /* CoacherWatch Watch AppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "CoacherWatch Watch AppTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		A9ED46082EAEB97200A66D28 /* CoacherWatch Watch AppUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "CoacherWatch Watch AppUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -161,6 +187,21 @@
 			path = CoacherUITests;
 			sourceTree = "<group>";
 		};
+		A9ED45F32EAEB97100A66D28 /* CoacherWatch Watch App */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = "CoacherWatch Watch App";
+			sourceTree = "<group>";
+		};
+		A9ED46012EAEB97200A66D28 /* CoacherWatch Watch AppTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = "CoacherWatch Watch AppTests";
+			sourceTree = "<group>";
+		};
+		A9ED460B2EAEB97200A66D28 /* CoacherWatch Watch AppUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = "CoacherWatch Watch AppUITests";
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -211,6 +252,27 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		A9ED45EF2EAEB97100A66D28 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A9ED45FB2EAEB97200A66D28 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A9ED46052EAEB97200A66D28 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -233,6 +295,9 @@
 				A9ACE3C32E63EB0B00BB3ADD /* CoacherTests */,
 				A9ACE3CD2E63EB0B00BB3ADD /* CoacherUITests */,
 				A989BB7A2EAE54870031A5F7 /* CoacherWidget2 */,
+				A9ED45F32EAEB97100A66D28 /* CoacherWatch Watch App */,
+				A9ED46012EAEB97200A66D28 /* CoacherWatch Watch AppTests */,
+				A9ED460B2EAEB97200A66D28 /* CoacherWatch Watch AppUITests */,
 				A989BB4F2EADB1EA0031A5F7 /* Frameworks */,
 				A9ACE3AF2E63EB0A00BB3ADD /* Products */,
 				A98276E42E693076006F3DA5 /* night prep additional.txt */,
@@ -249,6 +314,9 @@
 				A9ACE3C02E63EB0B00BB3ADD /* Lighter TomorrowTests.xctest */,
 				A9ACE3CA2E63EB0B00BB3ADD /* Lighter TomorrowUITests.xctest */,
 				A989BB772EAE54870031A5F7 /* CoacherWidget2Extension.appex */,
+				A9ED45F22EAEB97100A66D28 /* CoacherWatch Watch App.app */,
+				A9ED45FE2EAEB97200A66D28 /* CoacherWatch Watch AppTests.xctest */,
+				A9ED46082EAEB97200A66D28 /* CoacherWatch Watch AppUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -292,6 +360,7 @@
 			);
 			dependencies = (
 				A989BB892EAE54880031A5F7 /* PBXTargetDependency */,
+				A9ED46112EAEB97200A66D28 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				A9ACE3B02E63EB0A00BB3ADD /* Coacher */,
@@ -366,6 +435,74 @@
 			productReference = A9ACE3CA2E63EB0B00BB3ADD /* Lighter TomorrowUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
+		A9ED45F12EAEB97100A66D28 /* CoacherWatch Watch App */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A9ED46132EAEB97200A66D28 /* Build configuration list for PBXNativeTarget "CoacherWatch Watch App" */;
+			buildPhases = (
+				A9ED45EE2EAEB97100A66D28 /* Sources */,
+				A9ED45EF2EAEB97100A66D28 /* Frameworks */,
+				A9ED45F02EAEB97100A66D28 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				A9ED45F32EAEB97100A66D28 /* CoacherWatch Watch App */,
+			);
+			name = "CoacherWatch Watch App";
+			packageProductDependencies = (
+			);
+			productName = "CoacherWatch Watch App";
+			productReference = A9ED45F22EAEB97100A66D28 /* CoacherWatch Watch App.app */;
+			productType = "com.apple.product-type.application";
+		};
+		A9ED45FD2EAEB97200A66D28 /* CoacherWatch Watch AppTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A9ED46162EAEB97200A66D28 /* Build configuration list for PBXNativeTarget "CoacherWatch Watch AppTests" */;
+			buildPhases = (
+				A9ED45FA2EAEB97200A66D28 /* Sources */,
+				A9ED45FB2EAEB97200A66D28 /* Frameworks */,
+				A9ED45FC2EAEB97200A66D28 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				A9ED46002EAEB97200A66D28 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				A9ED46012EAEB97200A66D28 /* CoacherWatch Watch AppTests */,
+			);
+			name = "CoacherWatch Watch AppTests";
+			packageProductDependencies = (
+			);
+			productName = "CoacherWatch Watch AppTests";
+			productReference = A9ED45FE2EAEB97200A66D28 /* CoacherWatch Watch AppTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		A9ED46072EAEB97200A66D28 /* CoacherWatch Watch AppUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A9ED46192EAEB97200A66D28 /* Build configuration list for PBXNativeTarget "CoacherWatch Watch AppUITests" */;
+			buildPhases = (
+				A9ED46042EAEB97200A66D28 /* Sources */,
+				A9ED46052EAEB97200A66D28 /* Frameworks */,
+				A9ED46062EAEB97200A66D28 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				A9ED460A2EAEB97200A66D28 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				A9ED460B2EAEB97200A66D28 /* CoacherWatch Watch AppUITests */,
+			);
+			name = "CoacherWatch Watch AppUITests";
+			packageProductDependencies = (
+			);
+			productName = "CoacherWatch Watch AppUITests";
+			productReference = A9ED46082EAEB97200A66D28 /* CoacherWatch Watch AppUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -389,6 +526,17 @@
 					A9ACE3C92E63EB0B00BB3ADD = {
 						CreatedOnToolsVersion = 16.4;
 						TestTargetID = A9ACE3AD2E63EB0A00BB3ADD;
+					};
+					A9ED45F12EAEB97100A66D28 = {
+						CreatedOnToolsVersion = 16.4;
+					};
+					A9ED45FD2EAEB97200A66D28 = {
+						CreatedOnToolsVersion = 16.4;
+						TestTargetID = A9ED45F12EAEB97100A66D28;
+					};
+					A9ED46072EAEB97200A66D28 = {
+						CreatedOnToolsVersion = 16.4;
+						TestTargetID = A9ED45F12EAEB97100A66D28;
 					};
 				};
 			};
@@ -417,6 +565,9 @@
 				A9ACE3BF2E63EB0B00BB3ADD /* Lighter TomorrowTests */,
 				A9ACE3C92E63EB0B00BB3ADD /* Lighter TomorrowUITests */,
 				A989BB762EAE54870031A5F7 /* CoacherWidget2Extension */,
+				A9ED45F12EAEB97100A66D28 /* CoacherWatch Watch App */,
+				A9ED45FD2EAEB97200A66D28 /* CoacherWatch Watch AppTests */,
+				A9ED46072EAEB97200A66D28 /* CoacherWatch Watch AppUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -454,6 +605,27 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		A9ED45F02EAEB97100A66D28 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A9ED45FC2EAEB97200A66D28 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A9ED46062EAEB97200A66D28 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -485,6 +657,27 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		A9ED45EE2EAEB97100A66D28 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A9ED45FA2EAEB97200A66D28 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A9ED46042EAEB97200A66D28 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -502,6 +695,21 @@
 			isa = PBXTargetDependency;
 			target = A9ACE3AD2E63EB0A00BB3ADD /* Lighter Tomorrow */;
 			targetProxy = A9ACE3CB2E63EB0B00BB3ADD /* PBXContainerItemProxy */;
+		};
+		A9ED46002EAEB97200A66D28 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A9ED45F12EAEB97100A66D28 /* CoacherWatch Watch App */;
+			targetProxy = A9ED45FF2EAEB97200A66D28 /* PBXContainerItemProxy */;
+		};
+		A9ED460A2EAEB97200A66D28 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A9ED45F12EAEB97100A66D28 /* CoacherWatch Watch App */;
+			targetProxy = A9ED46092EAEB97200A66D28 /* PBXContainerItemProxy */;
+		};
+		A9ED46112EAEB97200A66D28 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A9ED45F12EAEB97100A66D28 /* CoacherWatch Watch App */;
+			targetProxy = A9ED46102EAEB97200A66D28 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -693,7 +901,7 @@
 				CODE_SIGN_ENTITLEMENTS = Coacher/Coacher.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 7;
+				CURRENT_PROJECT_VERSION = 8;
 				DEVELOPMENT_TEAM = Q3CS4DPG9Y;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -729,7 +937,7 @@
 				CODE_SIGN_ENTITLEMENTS = Coacher/Coacher.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 7;
+				CURRENT_PROJECT_VERSION = 8;
 				DEVELOPMENT_TEAM = Q3CS4DPG9Y;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -829,6 +1037,146 @@
 			};
 			name = Release;
 		};
+		A9ED46142EAEB97200A66D28 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = "CoacherWatch Watch App/CoacherWatch Watch App.entitlements";
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = Q3CS4DPG9Y;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "Lighter Tomorrow";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.RestRiseGrow.LighterTomorrow;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.RestRiseGrow.LighterTomorrow.watchkitapp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 11.5;
+			};
+			name = Debug;
+		};
+		A9ED46152EAEB97200A66D28 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = "CoacherWatch Watch App/CoacherWatch Watch App.entitlements";
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = Q3CS4DPG9Y;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "Lighter Tomorrow";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.RestRiseGrow.LighterTomorrow;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.RestRiseGrow.LighterTomorrow.watchkitapp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 11.5;
+			};
+			name = Release;
+		};
+		A9ED46172EAEB97200A66D28 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = Q3CS4DPG9Y;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "RestRiseGrow.CoacherWatch-Watch-AppTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/CoacherWatch Watch App.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/CoacherWatch Watch App";
+				WATCHOS_DEPLOYMENT_TARGET = 11.5;
+			};
+			name = Debug;
+		};
+		A9ED46182EAEB97200A66D28 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = Q3CS4DPG9Y;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "RestRiseGrow.CoacherWatch-Watch-AppTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/CoacherWatch Watch App.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/CoacherWatch Watch App";
+				WATCHOS_DEPLOYMENT_TARGET = 11.5;
+			};
+			name = Release;
+		};
+		A9ED461A2EAEB97200A66D28 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = Q3CS4DPG9Y;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "RestRiseGrow.CoacherWatch-Watch-AppUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				TEST_TARGET_NAME = "CoacherWatch Watch App";
+				WATCHOS_DEPLOYMENT_TARGET = 11.5;
+			};
+			name = Debug;
+		};
+		A9ED461B2EAEB97200A66D28 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = Q3CS4DPG9Y;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "RestRiseGrow.CoacherWatch-Watch-AppUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				TEST_TARGET_NAME = "CoacherWatch Watch App";
+				WATCHOS_DEPLOYMENT_TARGET = 11.5;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -873,6 +1221,33 @@
 			buildConfigurations = (
 				A9ACE3DB2E63EB0B00BB3ADD /* Debug */,
 				A9ACE3DC2E63EB0B00BB3ADD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A9ED46132EAEB97200A66D28 /* Build configuration list for PBXNativeTarget "CoacherWatch Watch App" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A9ED46142EAEB97200A66D28 /* Debug */,
+				A9ED46152EAEB97200A66D28 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A9ED46162EAEB97200A66D28 /* Build configuration list for PBXNativeTarget "CoacherWatch Watch AppTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A9ED46172EAEB97200A66D28 /* Debug */,
+				A9ED46182EAEB97200A66D28 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A9ED46192EAEB97200A66D28 /* Build configuration list for PBXNativeTarget "CoacherWatch Watch AppUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A9ED461A2EAEB97200A66D28 /* Debug */,
+				A9ED461B2EAEB97200A66D28 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
