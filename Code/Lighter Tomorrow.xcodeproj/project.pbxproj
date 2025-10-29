@@ -157,6 +157,18 @@
 			);
 			target = A9ACE3AD2E63EB0A00BB3ADD /* Lighter Tomorrow */;
 		};
+		A9ED463B2EAFC1F800A66D28 /* Exceptions for "Coacher" folder in "CoacherWatch Watch App" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Achievement.swift,
+				EmotionalTakeoverNote.swift,
+				EveningPrepItem.swift,
+				HabitHelperNote.swift,
+				LLMMessage.swift,
+				UserSettings.swift,
+			);
+			target = A9ED45F12EAEB97100A66D28 /* CoacherWatch Watch App */;
+		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -173,6 +185,7 @@
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
 				A989BB942EAE56370031A5F7 /* Exceptions for "Coacher" folder in "CoacherWidget2Extension" target */,
+				A9ED463B2EAFC1F800A66D28 /* Exceptions for "Coacher" folder in "CoacherWatch Watch App" target */,
 			);
 			path = Coacher;
 			sourceTree = "<group>";
@@ -901,7 +914,7 @@
 				CODE_SIGN_ENTITLEMENTS = Coacher/Coacher.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 8;
+				CURRENT_PROJECT_VERSION = 9;
 				DEVELOPMENT_TEAM = Q3CS4DPG9Y;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -937,7 +950,7 @@
 				CODE_SIGN_ENTITLEMENTS = Coacher/Coacher.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 8;
+				CURRENT_PROJECT_VERSION = 9;
 				DEVELOPMENT_TEAM = Q3CS4DPG9Y;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;

@@ -21,7 +21,7 @@ struct WatchMainView: View {
                     }
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 12)
-                    .background(Color.green.opacity(0.3))
+                    .background(Color(red: 0.192, green: 0.651, blue: 0.251))
                     .cornerRadius(12)
                 }
                 .buttonStyle(.plain)
@@ -36,7 +36,7 @@ struct WatchMainView: View {
                     }
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 12)
-                    .background(Color.orange.opacity(0.3))
+                    .background(Color(red: 0.984, green: 0.847, blue: 0.235))
                     .cornerRadius(12)
                 }
                 .buttonStyle(.plain)
@@ -51,13 +51,15 @@ struct WatchMainView: View {
                     }
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 12)
-                    .background(Color.blue.opacity(0.3))
+                    .background(Color.blue.opacity(0.8))
                     .cornerRadius(12)
                 }
                 .buttonStyle(.plain)
             }
             .padding()
         }
+        .background(Color(red: 0.545, green: 0.796, blue: 0.902))
+        .ignoresSafeArea()
     }
 }
 

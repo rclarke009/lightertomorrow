@@ -51,9 +51,6 @@ struct UrgeTimerView: View {
                 } else {
                     // Time picker
                     VStack(spacing: 24) {
-                        Text("Set timer duration")
-                            .font(.system(size: 16, weight: .semibold))
-                        
                         Picker("Minutes", selection: $selectedMinutes) {
                             ForEach(1...30, id: \.self) { minute in
                                 Text("\(minute) min")
@@ -67,13 +64,15 @@ struct UrgeTimerView: View {
                             startTimer()
                         }
                         .buttonStyle(.borderedProminent)
+                        .controlSize(.small)
                     }
                 }
             }
         }
         .padding()
         .navigationBarBackButtonHidden(false)
-        .navigationBarTitleDisplayMode(.automatic)
+        .navigationBarTitleDisplayMode(.inline)
+        .navigationTitle("")
         .onReceive(timer) { _ in
             if isTimerRunning && timeRemaining > 0 {
                 timeRemaining -= 1

@@ -1,5 +1,5 @@
 //
-//  IDidItWatchView.swift
+//  RecordStruggleView.swift
 //  Coacher Watch
 //
 //  Created on 9/6/25.
@@ -10,51 +10,48 @@ import SwiftData
 import WatchKit
 import WatchConnectivity
 
-struct IDidItWatchView: View {
+struct RecordStruggleView: View {
     @Environment(\.modelContext) private var modelContext
     @EnvironmentObject private var watchConnectivity: WatchConnectivityManager
-    @State private var showCelebration = false
+    @State private var showEncouragement = false
     @State private var transcribedText = ""
     @Environment(\.dismiss) var dismiss
     
     var body: some View {
         VStack(spacing: 30) {
-            if showCelebration {
-                // Celebration view
+            if showEncouragement {
+                // Encouragement view
                 VStack(spacing: 16) {
-                    Image(systemName: "star.fill")
+                    Image(systemName: "heart.fill")
                         .font(.system(size: 60))
-                        .foregroundColor(.yellow)
-                        .symbolEffect(.bounce, value: showCelebration)
+                        .foregroundColor(.pink)
                     
-                    Text("Way to go! 🌟")
-                        .font(.system(size: 20, weight: .bold))
+                    Text(randomEncouragement)
+                        .font(.system(size: 18, weight: .semibold))
+                        .multilineTextAlignment(.center)
                     
-                    Text("Success recorded")
+                    Text("Struggle recorded")
                         .font(.system(size: 14))
                         .foregroundColor(.secondary)
                 }
                 .onAppear {
-                    // Haptic feedback
                     WKInterfaceDevice.current().play(.notification)
-                    
-                    // Auto-dismiss after 3 seconds
                     DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
                         dismiss()
                     }
                 }
             } else {
-                // Success capture interface
+                // Recording interface
                 VStack(spacing: 20) {
                     Image(systemName: "mic.fill")
                         .font(.system(size: 48))
                         .foregroundColor(.orange)
                     
-                    Text("Celebrate your success!")
+                    Text("What's going on?")
                         .font(.system(size: 16, weight: .semibold))
                         .multilineTextAlignment(.center)
                     
-                    Text("Describe what you did")
+                    Text("Describe what you're feeling")
                         .font(.system(size: 12))
                         .foregroundColor(.secondary)
                         .multilineTextAlignment(.center)
@@ -63,6 +60,7 @@ struct IDidItWatchView: View {
                         presentDictation()
                     }
                     .buttonStyle(.borderedProminent)
+                    .tint(.orange)
                 }
             }
         }
@@ -75,66 +73,66 @@ struct IDidItWatchView: View {
             completion: { results in
                 if let texts = results as? [String], let firstText = texts.first, !firstText.isEmpty {
                     self.transcribedText = firstText
-                    self.saveAndCelebrate()
+                    self.saveAndEncourage()
                 }
             }
         )
     }
     
-    private func saveAndCelebrate() {
-        // Save with timestamp to indicate it was a voice recording
-        let timestamp = Date()
-        let dateFormatter = DateFormatter()
-        dateFormatter.timeStyle = .short
-        let text = transcribedText.isEmpty ? "Success recorded via voice at \(dateFormatter.string(from: timestamp))" : transcribedText
-        
-        saveSuccessNote(text: text, audioURL: nil)
+    private func saveAndEncourage() {
+        let text = transcribedText.isEmpty ? "Recorded struggle at \(Date().formatted(date: .omitted, time: .shortened))" : transcribedText
+        saveCravingNote(text: text)
         
         withAnimation {
-            showCelebration = true
+            showEncouragement = true
         }
     }
     
-    
-    private func saveSuccessNote(text: String, audioURL: URL?) {
-        let success = SuccessNote(
+    private func saveCravingNote(text: String) {
+        let craving = CravingNote(
             type: .other,
             text: text,
-            keptAudio: audioURL != nil,
-            audioURL: audioURL
+            keptAudio: false,
+            audioURL: nil
         )
         
-        print("🔄 DEBUG: Inserting success note with text: '\(text)'")
-        print("🔄 DEBUG: Success note ID: \(success.id)")
-        print("🔄 DEBUG: Success note date: \(success.date)")
-        
-        modelContext.insert(success)
+        modelContext.insert(craving)
         
         do {
             try modelContext.save()
-            print("✅ DEBUG: Successfully saved success note to modelContext")
-            
-            // Send to iOS via WatchConnectivity
-            sendToiOS(successNote: success)
+            print("✅ Saved craving note: \(text)")
+            sendToiOS(cravingNote: craving)
         } catch {
-            print("❌ DEBUG: Failed to save success note: \(error)")
+            print("❌ Failed to save craving note: \(error)")
         }
     }
     
-    private func sendToiOS(successNote: SuccessNote) {
+    private func sendToiOS(cravingNote: CravingNote) {
         let message: [String: Any] = [
-            "action": "successNote",
-            "text": successNote.text,
-            "date": successNote.date.timeIntervalSince1970,
-            "type": successNote.type.rawValue
+            "action": "cravingNote",
+            "text": cravingNote.text,
+            "date": cravingNote.date.timeIntervalSince1970,
+            "type": cravingNote.type.rawValue
         ]
-        
         watchConnectivity.sendMessageToiOS(message)
+    }
+    
+    private let encouragements = [
+        "You're doing great by acknowledging this 💪",
+        "It's okay to struggle. You're not alone 🤗",
+        "This feeling will pass 🌙",
+        "You're stronger than this moment ✨",
+        "One breath at a time 🌬️",
+        "You can do hard things 💫"
+    ]
+    
+    private var randomEncouragement: String {
+        encouragements.randomElement() ?? encouragements[0]
     }
 }
 
 #Preview {
     NavigationStack {
-        IDidItWatchView()
+        RecordStruggleView()
     }
 }
