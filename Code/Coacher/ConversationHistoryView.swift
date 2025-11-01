@@ -14,7 +14,26 @@ struct ConversationHistoryView: View {
     @EnvironmentObject private var hybridManager: HybridLLMManager
     @State private var searchText = ""
     @State private var selectedConversation: ConversationGroup?
+    @State private var showDeleteAllConfirmation = false
+    @State private var showDeleteConfirmation = false
+    @State private var conversationToDelete: ConversationGroup?
+    @State private var showStorageWarning = false
     @Query(sort: \LLMMessage.timestamp, order: .reverse) private var allMessages: [LLMMessage]
+    
+    // Storage threshold: 50MB
+    private let storageThresholdMB: Double = 50.0
+    
+    // Estimate storage size (approximately 500 bytes per message)
+    private var estimatedStorageMB: Double {
+        let bytesPerMessage: Double = 500.0
+        let totalBytes = Double(allMessages.count) * bytesPerMessage
+        return totalBytes / (1024.0 * 1024.0) // Convert to MB
+    }
+    
+    // Check if storage exceeds threshold
+    private var exceedsStorageThreshold: Bool {
+        estimatedStorageMB >= storageThresholdMB
+    }
     
     // Group conversations by conversationId first, then by date
     private var groupedConversations: [ConversationGroup] {
@@ -53,6 +72,7 @@ struct ConversationHistoryView: View {
             
             // Create conversation group (messages sorted newest first for display)
             allConversationGroups.append(ConversationGroup(
+                conversationId: conversationId,
                 date: date,
                 startTime: startTime,
                 endTime: endTime,
@@ -82,17 +102,33 @@ struct ConversationHistoryView: View {
     var body: some View {
         NavigationView {
             VStack(spacing: 0) {
-                // Search Bar
-                HStack {
-                    Image(systemName: "magnifyingglass")
-                        .foregroundColor(.secondary)
+                // Search Bar with Storage Info
+                VStack(spacing: 8) {
+                    HStack {
+                        Image(systemName: "magnifyingglass")
+                            .foregroundColor(.secondary)
+                        
+                        TextField("Search conversations...", text: $searchText)
+                            .textFieldStyle(PlainTextFieldStyle())
+                    }
+                    .padding()
+                    .background(Color.cardBackground)
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
                     
-                    TextField("Search conversations...", text: $searchText)
-                        .textFieldStyle(PlainTextFieldStyle())
+                    // Storage info
+                    HStack {
+                        Text("\(groupedConversations.count) \(groupedConversations.count == 1 ? "conversation" : "conversations"), ~\(String(format: "%.1f", estimatedStorageMB)) MB")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                        if exceedsStorageThreshold {
+                            Spacer()
+                            Image(systemName: "exclamationmark.triangle.fill")
+                                .foregroundColor(.orange)
+                                .font(.caption)
+                        }
+                    }
+                    .padding(.horizontal)
                 }
-                .padding()
-                .background(Color.cardBackground)
-                .clipShape(RoundedRectangle(cornerRadius: 12))
                 .padding(.horizontal)
                 .padding(.top)
                 
@@ -119,6 +155,14 @@ struct ConversationHistoryView: View {
                         ForEach(groupedConversations) { group in
                             ConversationRow(group: group)
                                 .id(group.id)
+                                .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                                    Button(role: .destructive) {
+                                        conversationToDelete = group
+                                        showDeleteConfirmation = true
+                                    } label: {
+                                        Label("Delete", systemImage: "trash")
+                                    }
+                                }
                                 .onTapGesture {
                                     print("🔍 DEBUG: Tapped conversation: \(group.startTime)")
                                     // Post notification with conversation time range
@@ -151,6 +195,63 @@ struct ConversationHistoryView: View {
                         dismiss()
                     }
                 }
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Menu {
+                        Button(role: .destructive, action: {
+                            showDeleteAllConfirmation = true
+                        }) {
+                            Label("Delete All", systemImage: "trash")
+                        }
+                    } label: {
+                        Image(systemName: "ellipsis.circle")
+                    }
+                }
+            }
+            .alert("Delete Conversation", isPresented: $showDeleteConfirmation, presenting: conversationToDelete) { group in
+                Button("Cancel", role: .cancel) {
+                    conversationToDelete = nil
+                }
+                Button("Delete", role: .destructive) {
+                    if let group = conversationToDelete {
+                        Task {
+                            do {
+                                try await hybridManager.deleteConversation(conversationId: group.conversationId, modelContext: modelContext)
+                            } catch {
+                                print("❌ Failed to delete conversation: \(error)")
+                            }
+                        }
+                    }
+                    conversationToDelete = nil
+                }
+            } message: { group in
+                let messageCount = group.messages.count
+                Text("Delete this conversation with \(messageCount) \(messageCount == 1 ? "message" : "messages")? This cannot be undone.")
+            }
+            .alert("Delete All Conversations", isPresented: $showDeleteAllConfirmation) {
+                Button("Cancel", role: .cancel) { }
+                Button("Delete All", role: .destructive) {
+                    Task {
+                        do {
+                            try await hybridManager.deleteAllConversations(modelContext: modelContext)
+                        } catch {
+                            print("❌ Failed to delete all conversations: \(error)")
+                        }
+                    }
+                }
+            } message: {
+                let conversationCount = groupedConversations.count
+                let messageCount = allMessages.count
+                Text("Delete all \(conversationCount) \(conversationCount == 1 ? "conversation" : "conversations") (\(messageCount) \(messageCount == 1 ? "message" : "messages"))? This cannot be undone. You'll free approximately \(String(format: "%.1f", estimatedStorageMB)) MB of storage.")
+            }
+            .alert("Storage Warning", isPresented: $showStorageWarning) {
+                Button("View Conversations", role: .cancel) {
+                    // User stays in the view to manage conversations
+                }
+                Button("Dismiss") {
+                    // Just dismiss the warning
+                }
+            } message: {
+                Text("Your conversation history is using approximately \(String(format: "%.1f", estimatedStorageMB)) MB of storage. Consider deleting old conversations to free up space.")
             }
         }
         .onAppear {
@@ -158,6 +259,15 @@ struct ConversationHistoryView: View {
             // Force refresh of query to ensure latest conversations are shown
             print("🔄 DEBUG: ConversationHistoryView appeared - query should auto-refresh")
             print("🔄 DEBUG: Current allMessages count: \(allMessages.count)")
+            print("💾 DEBUG: Estimated storage: \(String(format: "%.2f", estimatedStorageMB)) MB")
+            
+            // Check storage threshold and show warning if exceeded
+            // Only show once per session (use a flag)
+            let warningShownKey = "storageWarningShownThisSession"
+            if exceedsStorageThreshold && !UserDefaults.standard.bool(forKey: warningShownKey) {
+                showStorageWarning = true
+                UserDefaults.standard.set(true, forKey: warningShownKey)
+            }
         }
         .onChange(of: allMessages.count) { oldCount, newCount in
             print("🔄 DEBUG: allMessages count changed from \(oldCount) to \(newCount)")
@@ -173,6 +283,7 @@ struct ConversationHistoryView: View {
 
 struct ConversationGroup: Identifiable {
     let id = UUID()
+    let conversationId: UUID
     let date: Date
     let startTime: Date
     let endTime: Date

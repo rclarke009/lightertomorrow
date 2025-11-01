@@ -24,12 +24,118 @@ struct CoachView: View {
         GeometryReader { geometry in
             ZStack {
                 VStack(spacing: 0) {
-                // Chat Messages
-                ScrollViewReader { proxy in
-                    ZStack {
+                    // Fixed Top Bar
+                    HStack {
+                        // Start New Conversation Button (Top Left)
+                        Button(action: { 
+                            hybridManager.startNewConversation()
+                        }) {
+                            HStack(spacing: 6) {
+                                Image(systemName: "square.and.pencil")
+                                    .font(.caption)
+                                    .foregroundColor(.white)
+                                Text("New Chat")
+                                    .font(.caption)
+                                    .fontWeight(.medium)
+                                    .foregroundColor(.white)
+                            }
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 8)
+                            .background(
+                                RoundedRectangle(cornerRadius: 20)
+                                    .fill(Color.brandBlue)
+                            )
+                        }
+                        
+                        // AI Mode Toggle Button (Top Left) - Hidden until local AI option is available
+                        if FeatureFlags.useLocalLLM {
+                            Button(action: { 
+                                showOnlineAIConfirmation = true
+                            }) {
+                                HStack(spacing: 6) {
+                                    Image(systemName: hybridManager.isUsingCloudAI ? "cloud.fill" : "iphone")
+                                        .font(.caption)
+                                        .foregroundColor(.white)
+                                    Text(hybridManager.isUsingCloudAI ? "Online" : "Local")
+                                        .font(.caption)
+                                        .fontWeight(.medium)
+                                        .foregroundColor(.white)
+                                    if hybridManager.isUsingCloudAI {
+                                        Text("• \(hybridManager.getCurrentTokenUsage())")
+                                            .font(.caption2)
+                                            .foregroundColor(.white.opacity(0.8))
+                                    }
+                                }
+                                .padding(.horizontal, 12)
+                                .padding(.vertical, 8)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 20)
+                                        .fill(hybridManager.isUsingCloudAI ? Color.blue : Color.green)
+                                )
+                            }
+                        }
+                        
+                        Spacer()
+                        
+                        // AI Status Indicator (Top Center) - Only show if loading or not ready
+                        if hybridManager.isLoading {
+                            HStack(spacing: 6) {
+                                ProgressView()
+                                    .scaleEffect(0.7)
+                                Text("Loading AI...")
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                            }
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 6)
+                            .background(
+                                RoundedRectangle(cornerRadius: 16)
+                                    .fill(Color.cardBackground)
+                                    .shadow(color: .black.opacity(0.1), radius: 2, x: 0, y: 1)
+                            )
+                        } else if !hybridManager.isModelLoaded {
+                            HStack(spacing: 6) {
+                                Image(systemName: "exclamationmark.triangle")
+                                    .font(.caption)
+                                    .foregroundColor(.orange)
+                                Text("AI not ready")
+                                    .font(.caption)
+                                    .foregroundColor(.orange)
+                            }
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 6)
+                            .background(
+                                RoundedRectangle(cornerRadius: 16)
+                                    .fill(Color.cardBackground)
+                                    .shadow(color: .black.opacity(0.1), radius: 2, x: 0, y: 1)
+                            )
+                        }
+                        
+                        Spacer()
+                        
+                        // History Button (Top Right)
+                        Button(action: { showConversationHistory = true }) {
+                            Image(systemName: "line.3.horizontal")
+                                .font(.system(size: 18, weight: .medium))
+                                .foregroundColor(.primary)
+                                .frame(width: 44, height: 44)
+                                .background(
+                                    Circle()
+                                        .fill(Color.cardBackground)
+                                        .shadow(color: .black.opacity(0.1), radius: 2, x: 0, y: 1)
+                                )
+                        }
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.top, 4) //geometry.safeAreaInsets.top + 0)
+                    .padding(.bottom, 8)
+                    .background(Color.appBackground)
+                    
+                    // Chat Messages Area
+                    ScrollViewReader { proxy in
                         ScrollView {
-                                    LazyVStack(spacing: 16) {
-                                        if hybridManager.chatHistory.isEmpty {
+                            LazyVStack(spacing: 16) {
+                                if hybridManager.chatHistory.isEmpty {
                                     // Welcome Message
                                     VStack(spacing: 20) {
                                         Image(systemName: "brain.head.profile")
@@ -56,13 +162,13 @@ struct CoachView: View {
                                         }
                                     }
                                     .padding(.top, 40)
-                                        } else {
-                                            // Chat Messages
-                                            ForEach(hybridManager.chatHistory) { message in
-                                                ChatBubble(message: message)
-                                                    .id(message.id)
-                                            }
-                                        }
+                                } else {
+                                    // Chat Messages
+                                    ForEach(hybridManager.chatHistory) { message in
+                                        ChatBubble(message: message)
+                                            .id(message.id)
+                                    }
+                                }
                                 
                                 if hybridManager.isGeneratingResponse {
                                     HStack {
@@ -75,237 +181,103 @@ struct CoachView: View {
                                     .padding()
                                     .id("generating")
                                 }
-                                
-                                // Removed invisible anchor - no automatic scrolling
                             }
                             .padding()
                         }
-                        // Removed scroll position detection - no automatic scrolling
                         .onTapGesture {
                             // Dismiss keyboard when tapping on chat area
                             hideKeyboard()
                         }
-                        // Removed all automatic scrolling - users have full control
-                        
-                        // Removed floating scroll button - no automatic scrolling
-                    }
-                    .onChange(of: hybridManager.chatHistory.count) { _, _ in
-                        // Auto-scroll to show the latest message when new messages are added
-                        if let lastMessage = hybridManager.chatHistory.last {
-                            withAnimation(.easeInOut(duration: 0.5)) {
-                                proxy.scrollTo(lastMessage.id, anchor: .top)
-                            }
-                        }
-                    }
-                    .onChange(of: scrollToLastMessage) { _, shouldScroll in
-                        // Scroll to last (most recent) message when loading conversation from history
-                        print("🔄 DEBUG: onChange scrollToLastMessage triggered, shouldScroll: \(shouldScroll), chatHistory.count: \(hybridManager.chatHistory.count)")
-                        if shouldScroll, let lastMessage = hybridManager.chatHistory.last {
-                            print("✅ DEBUG: Scrolling to last message with id: \(lastMessage.id)")
-                            withAnimation(.easeInOut(duration: 0.5)) {
-                                proxy.scrollTo(lastMessage.id, anchor: .bottom)
-                            }
-                            // Reset flag after a brief delay to avoid immediate re-triggering
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                                scrollToLastMessage = false
-                            }
-                        }
-                    }
-                }
-                
-                // Message Input
-                VStack(spacing: 12) {
-                    // Model Loading State - Simple indicator in input area
-                    if hybridManager.isLoading {
-                        HStack {
-                            ProgressView()
-                                .scaleEffect(0.8)
-                            Text("Loading AI model...")
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                            Spacer()
-                        }
-                        .padding(.horizontal)
-                        .padding(.vertical, 8)
-                        .background(Color.cardBackground.opacity(0.5))
-                        .clipShape(RoundedRectangle(cornerRadius: 14))
-                    }
-                    
-                    // Input Field (disabled when model not ready)
-                    HStack(spacing: 12) {
-                        TextField(
-                            hybridManager.isModelLoaded ? "Ask your AI coach..." : "AI model loading...",
-                            text: $userMessage,
-                            axis: .vertical
-                        )
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
-                        .lineLimit(1...4)
-                        .disabled(!hybridManager.isModelLoaded || hybridManager.isLoading)
-                        .opacity(hybridManager.isModelLoaded ? 1.0 : 0.6)
-                        .onSubmit {
-                            if hybridManager.isModelLoaded && !hybridManager.isLoading {
-                                sendMessage()
-                            }
-                        }
-                        .onTapGesture {
-                            // Don't dismiss keyboard when tapping text field
-                        }
-                        
-                        Button(action: sendMessage) {
-                            Image(systemName: "paperplane.fill")
-                            .foregroundColor(.white)
-                            .frame(width: 36, height: 36)
-                            .background(hybridManager.isModelLoaded ? Color.brandBlue : Color.gray)
-                            .clipShape(Circle())
-                        }
-                        .disabled(
-                            userMessage.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || 
-                            hybridManager.isGeneratingResponse || 
-                            !hybridManager.isModelLoaded || 
-                            hybridManager.isLoading
-                        )
-                    }
-                    .padding(.horizontal, 4)
-                    
-                }
-                .padding(.horizontal, 16)
-                .padding(.vertical, 12)
-                .background(Color.cardBackground)
-                .onTapGesture {
-                    // Don't dismiss keyboard when tapping input area
-                }
-            }
-            .padding(.horizontal, 0)
-            .padding(.vertical)
-            //.background(Color(.systemBackground))
-            .background(
-                Color.appBackground
-                    .ignoresSafeArea(.all)
-            )
-            
-            // Floating Controls - positioned with proper safe area
-            VStack(spacing: 0) {
-                HStack {
-                    // Start New Conversation Button (Top Left)
-                    Button(action: { 
-                        hybridManager.startNewConversation()
-                    }) {
-                        HStack(spacing: 6) {
-                            Image(systemName: "square.and.pencil")
-                                .font(.caption)
-                                .foregroundColor(.white)
-                            Text("New Chat")
-                                .font(.caption)
-                                .fontWeight(.medium)
-                                .foregroundColor(.white)
-                        }
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 8)
-                        .background(
-                            RoundedRectangle(cornerRadius: 20)
-                                .fill(Color.brandBlue)
-                        )
-                    }
-                    
-                    // AI Mode Toggle Button (Top Left) - Hidden until local AI option is available
-                    if FeatureFlags.useLocalLLM {
-                        Button(action: { 
-                            showOnlineAIConfirmation = true
-                        }) {
-                            HStack(spacing: 6) {
-                                Image(systemName: hybridManager.isUsingCloudAI ? "cloud.fill" : "iphone")
-                                    .font(.caption)
-                                    .foregroundColor(.white)
-                                Text(hybridManager.isUsingCloudAI ? "Online" : "Local")
-                                    .font(.caption)
-                                    .fontWeight(.medium)
-                                    .foregroundColor(.white)
-                                if hybridManager.isUsingCloudAI {
-                                    Text("• \(hybridManager.getCurrentTokenUsage())")
-                                        .font(.caption2)
-                                        .foregroundColor(.white.opacity(0.8))
+                        .onChange(of: hybridManager.chatHistory.count) { _, _ in
+                            // Auto-scroll to show the latest message when new messages are added
+                            if let lastMessage = hybridManager.chatHistory.last {
+                                withAnimation(.easeInOut(duration: 0.5)) {
+                                    proxy.scrollTo(lastMessage.id, anchor: .top)
                                 }
                             }
-                            .padding(.horizontal, 12)
+                        }
+                        .onChange(of: scrollToLastMessage) { _, shouldScroll in
+                            // Scroll to last (most recent) message when loading conversation from history
+                            print("🔄 DEBUG: onChange scrollToLastMessage triggered, shouldScroll: \(shouldScroll), chatHistory.count: \(hybridManager.chatHistory.count)")
+                            if shouldScroll, let lastMessage = hybridManager.chatHistory.last {
+                                print("✅ DEBUG: Scrolling to last message with id: \(lastMessage.id)")
+                                withAnimation(.easeInOut(duration: 0.5)) {
+                                    proxy.scrollTo(lastMessage.id, anchor: .bottom)
+                                }
+                                // Reset flag after a brief delay to avoid immediate re-triggering
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                    scrollToLastMessage = false
+                                }
+                            }
+                        }
+                    }
+                    
+                    // Message Input
+                    VStack(spacing: 12) {
+                        // Model Loading State - Simple indicator in input area
+                        if hybridManager.isLoading {
+                            HStack {
+                                ProgressView()
+                                    .scaleEffect(0.8)
+                                Text("Loading AI model...")
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                                Spacer()
+                            }
+                            .padding(.horizontal)
                             .padding(.vertical, 8)
-                            .background(
-                                RoundedRectangle(cornerRadius: 20)
-                                    .fill(hybridManager.isUsingCloudAI ? Color.blue : Color.green)
+                            .background(Color.cardBackground.opacity(0.5))
+                            .clipShape(RoundedRectangle(cornerRadius: 14))
+                        }
+                        
+                        // Input Field (disabled when model not ready)
+                        HStack(spacing: 12) {
+                            TextField(
+                                hybridManager.isModelLoaded ? "Ask your AI coach..." : "AI model loading...",
+                                text: $userMessage,
+                                axis: .vertical
+                            )
+                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                            .lineLimit(1...4)
+                            .disabled(!hybridManager.isModelLoaded || hybridManager.isLoading)
+                            .opacity(hybridManager.isModelLoaded ? 1.0 : 0.6)
+                            .onSubmit {
+                                if hybridManager.isModelLoaded && !hybridManager.isLoading {
+                                    sendMessage()
+                                }
+                            }
+                            .onTapGesture {
+                                // Don't dismiss keyboard when tapping text field
+                            }
+                            
+                            Button(action: sendMessage) {
+                                Image(systemName: "paperplane.fill")
+                                .foregroundColor(.white)
+                                .frame(width: 36, height: 36)
+                                .background(hybridManager.isModelLoaded ? Color.brandBlue : Color.gray)
+                                .clipShape(Circle())
+                            }
+                            .disabled(
+                                userMessage.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || 
+                                hybridManager.isGeneratingResponse || 
+                                !hybridManager.isModelLoaded || 
+                                hybridManager.isLoading
                             )
                         }
+                        .padding(.horizontal, 4)
+                        
                     }
-                    
-                    Spacer()
-                    
-                    // History Button (Top Right)
-                    Button(action: { showConversationHistory = true }) {
-                        Image(systemName: "line.3.horizontal")
-                            .font(.system(size: 18, weight: .medium))
-                            .foregroundColor(.primary)
-                            .frame(width: 44, height: 44)
-                            .background(
-                                Circle()
-                                    .fill(Color.cardBackground)
-                                    .shadow(color: .black.opacity(0.1), radius: 2, x: 0, y: 1)
-                            )
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 12)
+                    .background(Color.cardBackground)
+                    .onTapGesture {
+                        // Don't dismiss keyboard when tapping input area
                     }
                 }
-                .padding(.horizontal, 16)
-                .padding(.top, geometry.safeAreaInsets.top + 8)
-                .padding(.bottom, 8)
-                
-                Spacer()
-            }
-            
-            // AI Status Indicator (Top Center)
-            if hybridManager.isLoading {
-                VStack {
-                    HStack {
-                        Spacer()
-                        HStack(spacing: 6) {
-                            ProgressView()
-                                .scaleEffect(0.7)
-                            Text("Loading AI...")
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                        }
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 6)
-                        .background(
-                            RoundedRectangle(cornerRadius: 16)
-                                .fill(Color.cardBackground)
-                                .shadow(color: .black.opacity(0.1), radius: 2, x: 0, y: 1)
-                        )
-                        Spacer()
-                    }
-                    .padding(.top, geometry.safeAreaInsets.top + 60)
-                    Spacer()
-                }
-            } else if !hybridManager.isModelLoaded {
-                VStack {
-                    HStack {
-                        Spacer()
-                        HStack(spacing: 6) {
-                            Image(systemName: "exclamationmark.triangle")
-                                .font(.caption)
-                                .foregroundColor(.orange)
-                            Text("AI not ready")
-                                .font(.caption)
-                                .foregroundColor(.orange)
-                        }
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 6)
-                        .background(
-                            RoundedRectangle(cornerRadius: 16)
-                                .fill(Color.cardBackground)
-                                .shadow(color: .black.opacity(0.1), radius: 2, x: 0, y: 1)
-                        )
-                        Spacer()
-                    }
-                    .padding(.top, geometry.safeAreaInsets.top + 60)
-                    Spacer()
-                }
-                }
+                .background(
+                    Color.appBackground
+                        .ignoresSafeArea(.all)
+                )
             }
             
             // Coming Soon Overlay

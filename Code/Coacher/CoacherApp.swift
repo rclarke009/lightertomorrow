@@ -69,7 +69,7 @@ struct CoacherApp: App {
             if deletedAny {
                 UserDefaults.standard.set(true, forKey: migrationKey)
                 print("✅ DEBUG: Migration complete - database reset for conversationId schema")
-            }
+                }
         }
         
         let modelConfiguration = ModelConfiguration(

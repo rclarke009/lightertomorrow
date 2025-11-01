@@ -44,7 +44,10 @@ struct TodayView: View {
                         // Widget prompt banner
                         if shouldShowWidgetBanner {
                             WidgetPromptBanner(
-                                onShowGuide: { showWidgetGuide = true },
+                                onShowGuide: { 
+                                    showWidgetGuide = true
+                                    hasSeenWidgetGuide = true // Dismiss banner when user clicks "Show Me How"
+                                },
                                 onDismiss: { 
                                     hasSeenWidgetGuide = true
                                 }

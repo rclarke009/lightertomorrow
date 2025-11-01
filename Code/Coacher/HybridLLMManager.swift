@@ -342,6 +342,58 @@ class HybridLLMManager: ObservableObject {
         }
     }
     
+    // MARK: - Conversation Deletion
+    
+    /// Delete all messages with a specific conversationId
+    func deleteConversation(conversationId: UUID, modelContext: ModelContext?) async throws {
+        guard let modelContext = modelContext else {
+            throw NSError(domain: "HybridLLMManager", code: -1, userInfo: [NSLocalizedDescriptionKey: "No ModelContext provided"])
+        }
+        
+        try await MainActor.run {
+            // Fetch all messages and filter by conversationId (SwiftData #Predicate doesn't support UUID comparison directly)
+            let descriptor = FetchDescriptor<LLMMessage>()
+            
+            let allMessages = try modelContext.fetch(descriptor)
+            let messagesToDelete = allMessages.filter { $0.conversationId == conversationId }
+            
+            for message in messagesToDelete {
+                modelContext.delete(message)
+                // Remove from in-memory cache if present
+                if let index = chatHistory.firstIndex(where: { $0.id == message.id }) {
+                    chatHistory.remove(at: index)
+                }
+            }
+            try modelContext.save()
+            print("✅ DEBUG: Deleted conversation with ID \(conversationId.uuidString.prefix(8)) - removed \(messagesToDelete.count) messages")
+        }
+    }
+    
+    /// Delete all conversations (all LLMMessage objects)
+    func deleteAllConversations(modelContext: ModelContext?) async throws {
+        guard let modelContext = modelContext else {
+            throw NSError(domain: "HybridLLMManager", code: -1, userInfo: [NSLocalizedDescriptionKey: "No ModelContext provided"])
+        }
+        
+        try await MainActor.run {
+            let descriptor = FetchDescriptor<LLMMessage>()
+            
+            let allMessages = try modelContext.fetch(descriptor)
+            for message in allMessages {
+                modelContext.delete(message)
+            }
+            
+            // Clear in-memory cache
+            chatHistory = []
+            
+            // Reset conversation ID
+            currentConversationId = UUID()
+            
+            try modelContext.save()
+            print("✅ DEBUG: Deleted all conversations - removed \(allMessages.count) messages")
+        }
+    }
+    
     // MARK: - Model Status
     
     var modelStatus: String {
