@@ -21,7 +21,6 @@ struct CoacherWidget2: Widget {
     var body: some WidgetConfiguration {
         StaticConfiguration(kind: kind, provider: CoacherTimelineProvider()) { entry in
             CoacherWidgetEntryView(entry: entry)
-                .containerBackground(Color.widgetBackground, for: .widget)
         }
         .configurationDisplayName("Coacher")
         .description("Quick access to I Need Help and I Did Great! features.")
@@ -32,18 +31,31 @@ struct CoacherWidget2: Widget {
 struct CoacherWidgetEntryView: View {
     var entry: CoacherTimelineProvider.Entry
     @Environment(\.widgetFamily) var family
+    @Environment(\.colorScheme) var colorScheme
+
+    private var backgroundColor: Color {
+        if family == .systemLarge {
+            // Light blue in light mode for large widget specifically
+            return colorScheme == .light ? Color(red: 0.545, green: 0.796, blue: 0.902) : Color.widgetBackground
+        } else {
+            return Color.widgetBackground
+        }
+    }
 
     var body: some View {
-        switch family {
-        case .systemSmall:
-            SmallWidgetView(entry: entry)
-        case .systemMedium:
-            MediumWidgetView(entry: entry)
-        case .systemLarge:
-            LargeWidgetView(entry: entry)
-        default:
-            SmallWidgetView(entry: entry)
+        Group {
+            switch family {
+            case .systemSmall:
+                SmallWidgetView(entry: entry)
+            case .systemMedium:
+                MediumWidgetView(entry: entry)
+            case .systemLarge:
+                LargeWidgetView(entry: entry)
+            default:
+                SmallWidgetView(entry: entry)
+            }
         }
+        .containerBackground(backgroundColor, for: .widget)
     }
 }
 
