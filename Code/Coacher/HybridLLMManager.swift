@@ -12,6 +12,7 @@ class HybridLLMManager: ObservableObject {
     @Published var chatHistory: [LLMMessage] = []
     @Published var isUsingCloudAI = false
     @AppStorage("useCloudAI") private var useCloudAI = false
+    @Published var currentConversationId: UUID
     
     // Managers
     private let localManager = MLXLLMManager()
@@ -22,6 +23,7 @@ class HybridLLMManager: ObservableObject {
     
     init() {
         chatHistory = []
+        currentConversationId = UUID() // Initialize with first conversation ID
         // Force cloud AI if coaching feature is enabled (local AI is disabled)
         if FeatureFlags.enableCoaching {
             useCloudAI = true
@@ -193,7 +195,8 @@ class HybridLLMManager: ObservableObject {
             let message = LLMMessage(
                 role: role,
                 content: content,
-                timestamp: Date()
+                timestamp: Date(),
+                conversationId: currentConversationId
             )
             chatHistory.append(message)
             
@@ -203,9 +206,15 @@ class HybridLLMManager: ObservableObject {
                 do {
                     try modelContext.save()
                     print("✅ DEBUG: Saved LLMMessage to SwiftData: \(role.rawValue) - \(content.prefix(50))...")
+                    print("✅ DEBUG: Message timestamp: \(message.timestamp)")
+                    print("✅ DEBUG: Message ID: \(message.id)")
+                    print("✅ DEBUG: Conversation ID: \(message.conversationId)")
                 } catch {
                     print("❌ DEBUG: Failed to save LLMMessage to SwiftData: \(error)")
+                    print("❌ DEBUG: Error details: \(error.localizedDescription)")
                 }
+            } else {
+                print("⚠️ DEBUG: No ModelContext provided to saveMessage - message not saved to SwiftData")
             }
         }
     }
@@ -225,10 +234,110 @@ class HybridLLMManager: ObservableObject {
             do {
                 let messages = try modelContext.fetch(descriptor)
                 chatHistory = messages
-                print("✅ DEBUG: Loaded \(messages.count) messages from SwiftData")
+                // Set currentConversationId to the most recent conversation's ID
+                // This allows new messages to continue the most recent conversation unless "New Conversation" is clicked
+                if let mostRecentMessage = messages.last {
+                    currentConversationId = mostRecentMessage.conversationId
+                    print("✅ DEBUG: Loaded \(messages.count) messages from SwiftData")
+                    print("✅ DEBUG: Set currentConversationId to most recent: \(currentConversationId)")
+                } else {
+                    // No messages, keep the new conversation ID that was initialized
+                    print("✅ DEBUG: No existing messages, keeping new conversation ID: \(currentConversationId)")
+                }
             } catch {
                 print("❌ DEBUG: Failed to load chat history from SwiftData: \(error)")
                 chatHistory = []
+            }
+        }
+    }
+    
+    /// Clear current conversation (in-memory only, preserves SwiftData history) and start a new conversation with a new ID
+    func startNewConversation() {
+        chatHistory = []
+        currentConversationId = UUID() // Generate new conversation ID
+        print("✅ Started new conversation - chat history cleared, new conversation ID: \(currentConversationId)")
+    }
+    
+    /// Load conversation containing a specific message (loads messages from the same day)
+    func loadConversation(containing messageTimestamp: Date, modelContext: ModelContext?) async {
+        guard let modelContext = modelContext else {
+            print("⚠️ DEBUG: No ModelContext provided, skipping conversation load")
+            return
+        }
+        
+        await MainActor.run {
+            let calendar = Calendar.current
+            let messageDay = calendar.startOfDay(for: messageTimestamp)
+            let nextDay = calendar.date(byAdding: .day, value: 1, to: messageDay)!
+            
+            print("🔍 DEBUG: Loading conversation for timestamp: \(messageTimestamp)")
+            print("🔍 DEBUG: Message day: \(messageDay)")
+            print("🔍 DEBUG: Next day: \(nextDay)")
+            
+            let descriptor = FetchDescriptor<LLMMessage>(
+                predicate: #Predicate<LLMMessage> { message in
+                    message.timestamp >= messageDay && message.timestamp < nextDay
+                },
+                sortBy: [SortDescriptor(\.timestamp, order: .forward)]
+            )
+            
+            do {
+                let messages = try modelContext.fetch(descriptor)
+                chatHistory = messages
+                // Update currentConversationId to match the loaded conversation
+                if let firstMessage = messages.first {
+                    currentConversationId = firstMessage.conversationId
+                    print("✅ DEBUG: Loaded conversation with \(messages.count) messages from \(messageDay)")
+                    print("✅ DEBUG: Set currentConversationId to: \(currentConversationId)")
+                }
+            } catch {
+                print("❌ DEBUG: Failed to load conversation from SwiftData: \(error)")
+                // Fallback: load all messages
+                Task {
+                    await loadChatHistory(modelContext: modelContext)
+                }
+            }
+        }
+    }
+    
+    /// Load conversation within a specific time range
+    func loadConversation(from startTime: Date, to endTime: Date, modelContext: ModelContext?) async {
+        guard let modelContext = modelContext else {
+            print("⚠️ DEBUG: No ModelContext provided, skipping conversation load")
+            return
+        }
+        
+        await MainActor.run {
+            // Add small buffer to ensure we get all messages in the conversation
+            let buffer: TimeInterval = 1 // 1 second buffer
+            
+            let startTimeWithBuffer = startTime.addingTimeInterval(-buffer)
+            let endTimeWithBuffer = endTime.addingTimeInterval(buffer)
+            
+            print("🔍 DEBUG: Loading conversation from \(startTime) to \(endTime)")
+            
+            let descriptor = FetchDescriptor<LLMMessage>(
+                predicate: #Predicate<LLMMessage> { message in
+                    message.timestamp >= startTimeWithBuffer && message.timestamp <= endTimeWithBuffer
+                },
+                sortBy: [SortDescriptor(\.timestamp, order: .forward)]
+            )
+            
+            do {
+                let messages = try modelContext.fetch(descriptor)
+                chatHistory = messages
+                // Update currentConversationId to match the loaded conversation
+                if let firstMessage = messages.first {
+                    currentConversationId = firstMessage.conversationId
+                    print("✅ DEBUG: Loaded conversation with \(messages.count) messages from time range")
+                    print("✅ DEBUG: Set currentConversationId to: \(currentConversationId)")
+                }
+            } catch {
+                print("❌ DEBUG: Failed to load conversation from SwiftData: \(error)")
+                // Fallback: load all messages
+                Task {
+                    await loadChatHistory(modelContext: modelContext)
+                }
             }
         }
     }

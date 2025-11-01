@@ -14,12 +14,14 @@ final class LLMMessage {
     var role: Role
     var content: String
     var timestamp: Date
+    var conversationId: UUID
     
-    init(role: Role, content: String, timestamp: Date = Date()) {
+    init(role: Role, content: String, timestamp: Date = Date(), conversationId: UUID = UUID()) {
         self.id = UUID()
         self.role = role
         self.content = content
         self.timestamp = timestamp
+        self.conversationId = conversationId
     }
 }
 

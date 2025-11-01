@@ -48,6 +48,30 @@ struct CoacherApp: App {
         print("📱 DEBUG: iOS using App Group: \(appGroupIdentifier)")
         print("📱 DEBUG: iOS App Group URL: \(groupURL)")
         
+        // One-time migration: Delete existing database files to start fresh (schema changed - added conversationId)
+        // This only runs once on first launch after the schema change
+        let migrationKey = "hasMigratedToConversationIdSchema"
+        if !UserDefaults.standard.bool(forKey: migrationKey) {
+            let databaseFiles = ["default.store", "default.store-shm", "default.store-wal"]
+            var deletedAny = false
+            for fileName in databaseFiles {
+                let fileURL = groupURL.appendingPathComponent(fileName)
+                if FileManager.default.fileExists(atPath: fileURL.path) {
+                    do {
+                        try FileManager.default.removeItem(at: fileURL)
+                        print("🗑️ DEBUG: Deleted old database file: \(fileName)")
+                        deletedAny = true
+                    } catch {
+                        print("⚠️ DEBUG: Failed to delete \(fileName): \(error)")
+                    }
+                }
+            }
+            if deletedAny {
+                UserDefaults.standard.set(true, forKey: migrationKey)
+                print("✅ DEBUG: Migration complete - database reset for conversationId schema")
+            }
+        }
+        
         let modelConfiguration = ModelConfiguration(
             schema: schema,
             isStoredInMemoryOnly: false,

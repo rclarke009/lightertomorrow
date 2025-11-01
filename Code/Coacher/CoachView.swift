@@ -17,6 +17,8 @@ struct CoachView: View {
     @State private var showOnlineAIConfirmation = false
     @State private var showComingSoon = !FeatureFlags.enableCoaching // Show coming soon overlay unless coaching is enabled
     @State private var showUsageWarning = false
+    @State private var scrollToLastMessage = false
+    @State private var hasLoadedInitialHistory = false
     
     var body: some View {
         GeometryReader { geometry in
@@ -95,6 +97,20 @@ struct CoachView: View {
                             }
                         }
                     }
+                    .onChange(of: scrollToLastMessage) { _, shouldScroll in
+                        // Scroll to last (most recent) message when loading conversation from history
+                        print("🔄 DEBUG: onChange scrollToLastMessage triggered, shouldScroll: \(shouldScroll), chatHistory.count: \(hybridManager.chatHistory.count)")
+                        if shouldScroll, let lastMessage = hybridManager.chatHistory.last {
+                            print("✅ DEBUG: Scrolling to last message with id: \(lastMessage.id)")
+                            withAnimation(.easeInOut(duration: 0.5)) {
+                                proxy.scrollTo(lastMessage.id, anchor: .bottom)
+                            }
+                            // Reset flag after a brief delay to avoid immediate re-triggering
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                scrollToLastMessage = false
+                            }
+                        }
+                    }
                 }
                 
                 // Message Input
@@ -170,6 +186,27 @@ struct CoachView: View {
             // Floating Controls - positioned with proper safe area
             VStack(spacing: 0) {
                 HStack {
+                    // Start New Conversation Button (Top Left)
+                    Button(action: { 
+                        hybridManager.startNewConversation()
+                    }) {
+                        HStack(spacing: 6) {
+                            Image(systemName: "square.and.pencil")
+                                .font(.caption)
+                                .foregroundColor(.white)
+                            Text("New Chat")
+                                .font(.caption)
+                                .fontWeight(.medium)
+                                .foregroundColor(.white)
+                        }
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 8)
+                        .background(
+                            RoundedRectangle(cornerRadius: 20)
+                                .fill(Color.brandBlue)
+                        )
+                    }
+                    
                     // AI Mode Toggle Button (Top Left) - Hidden until local AI option is available
                     if FeatureFlags.useLocalLLM {
                         Button(action: { 
@@ -289,10 +326,10 @@ struct CoachView: View {
                         .fontWeight(.bold)
                         .foregroundColor(.primary)
                     
-                    Text("Coming Soon")
-                        .font(.title2)
-                        .fontWeight(.medium)
-                        .foregroundColor(.secondary)
+                    // Text("Coming Soon")
+                    //     .font(.title2)
+                    //     .fontWeight(.medium)
+                    //     .foregroundColor(.secondary)
                     
                     Text("Your AI coach is being prepared to help you on your wellness journey. Stay tuned!")
                         .font(.body)
@@ -331,13 +368,41 @@ struct CoachView: View {
             // Model loading is now handled globally in CoacherApp
             // No need to load here as it's already started in background
             
-            // Load chat history from SwiftData when view appears
-            Task {
-                await hybridManager.loadChatHistory(modelContext: modelContext)
+            // Load chat history from SwiftData when view appears (only first time)
+            if !hasLoadedInitialHistory {
+                Task {
+                    await hybridManager.loadChatHistory(modelContext: modelContext)
+                    hasLoadedInitialHistory = true
+                }
             }
         }
         .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("ShowUsageWarning"))) { _ in
             showUsageWarning = true
+        }
+        .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("LoadConversation"))) { notification in
+            if let userInfo = notification.userInfo {
+                // Try new format first (with startTime and endTime)
+                if let startTime = userInfo["startTime"] as? Date,
+                   let endTime = userInfo["endTime"] as? Date {
+                    print("🔔 DEBUG: Received LoadConversation notification with time range: \(startTime) to \(endTime)")
+                    Task {
+                        await hybridManager.loadConversation(from: startTime, to: endTime, modelContext: modelContext)
+                        // Set flag to scroll to last (most recent) message after loading
+                        print("✅ DEBUG: Setting scrollToLastMessage to true")
+                        scrollToLastMessage = true
+                    }
+                }
+                // Fallback to old format (with timestamp) for backward compatibility
+                else if let timestamp = userInfo["timestamp"] as? Date {
+                    print("🔔 DEBUG: Received LoadConversation notification with timestamp: \(timestamp)")
+                    Task {
+                        await hybridManager.loadConversation(containing: timestamp, modelContext: modelContext)
+                        // Set flag to scroll to last (most recent) message after loading
+                        print("✅ DEBUG: Setting scrollToLastMessage to true")
+                        scrollToLastMessage = true
+                    }
+                }
+            }
         }
         .onChange(of: hybridManager.isUsingCloudAI) { _, _ in
             Task {
