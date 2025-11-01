@@ -117,7 +117,7 @@ struct CoachView: View {
                         Button(action: { showConversationHistory = true }) {
                             Image(systemName: "line.3.horizontal")
                                 .font(.system(size: 18, weight: .medium))
-                                .foregroundColor(.primary)
+                                .foregroundColor(colorScheme == .dark ? .white : .primary)
                                 .frame(width: 44, height: 44)
                                 .background(
                                     Circle()
@@ -232,14 +232,13 @@ struct CoachView: View {
                         
                         // Input Field (disabled when model not ready)
                         HStack(spacing: 12) {
-                            TextField(
-                                hybridManager.isModelLoaded ? "Ask your AI coach..." : "AI model loading...",
+                            CustomTextField(
+                                placeholder: hybridManager.isModelLoaded ? "Ask your AI coach..." : "AI model loading...",
                                 text: $userMessage,
-                                axis: .vertical
+                                isEnabled: hybridManager.isModelLoaded && !hybridManager.isLoading,
+                                colorScheme: colorScheme
                             )
-                            .textFieldStyle(RoundedBorderTextFieldStyle())
-                            .lineLimit(1...4)
-                            .disabled(!hybridManager.isModelLoaded || hybridManager.isLoading)
+                            .frame(height: 36)
                             .opacity(hybridManager.isModelLoaded ? 1.0 : 0.6)
                             .onSubmit {
                                 if hybridManager.isModelLoaded && !hybridManager.isLoading {
@@ -464,6 +463,63 @@ struct ChatBubble: View {
                 }
                 Spacer()
             }
+        }
+    }
+}
+
+// MARK: - Custom TextField with Placeholder Color Control
+
+struct CustomTextField: UIViewRepresentable {
+    let placeholder: String
+    @Binding var text: String
+    let isEnabled: Bool
+    let colorScheme: ColorScheme
+    
+    func makeUIView(context: Context) -> UITextField {
+        let textField = UITextField()
+        textField.borderStyle = .roundedRect
+        textField.placeholder = placeholder
+        textField.delegate = context.coordinator
+        textField.returnKeyType = .default
+        textField.font = UIFont.preferredFont(forTextStyle: .body)
+        updatePlaceholderColor(textField)
+        return textField
+    }
+    
+    func updateUIView(_ uiView: UITextField, context: Context) {
+        uiView.text = text
+        uiView.isEnabled = isEnabled
+        uiView.textColor = colorScheme == .dark ? .white : .label
+        uiView.placeholder = placeholder
+        updatePlaceholderColor(uiView)
+    }
+    
+    private func updatePlaceholderColor(_ textField: UITextField) {
+        let placeholderColor: UIColor = colorScheme == .dark ? .white : .placeholderText
+        textField.attributedPlaceholder = NSAttributedString(
+            string: placeholder,
+            attributes: [NSAttributedString.Key.foregroundColor: placeholderColor]
+        )
+    }
+    
+    func makeCoordinator() -> Coordinator {
+        Coordinator(self)
+    }
+    
+    class Coordinator: NSObject, UITextFieldDelegate {
+        var parent: CustomTextField
+        
+        init(_ parent: CustomTextField) {
+            self.parent = parent
+        }
+        
+        func textFieldDidChangeSelection(_ textField: UITextField) {
+            parent.text = textField.text ?? ""
+        }
+        
+        func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+            textField.resignFirstResponder()
+            return true
         }
     }
 }
