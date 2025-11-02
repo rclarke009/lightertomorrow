@@ -208,6 +208,47 @@ These services are free, confidential, and available 24/7. You don't have to fac
   };
 }
 
+// Detect if OpenAI returned a guardrail/refusal response
+function detectGuardrailResponse(response) {
+  const lowerResponse = response.toLowerCase();
+  
+  // Common guardrail phrases OpenAI uses
+  const guardrailPhrases = [
+    "i can't help",
+    "i cannot assist",
+    "i'm not able to",
+    "i cannot provide",
+    "i'm not allowed",
+    "i can't provide information",
+    "i can't help with that",
+    "i cannot help with",
+    "i'm unable to",
+    "i'm sorry, but i cannot",
+    "i can't provide that",
+    "i cannot provide that information",
+    "i cannot and will not",
+    "i'm designed not to",
+    "i cannot answer that",
+    "i can't answer that",
+    "i cannot support",
+    "i cannot provide advice",
+    "i cannot provide recommendations",
+    "content policy",
+    "safety guidelines",
+    "i can't engage",
+    "i cannot engage with",
+    "i must decline",
+    "i have to decline",
+    "i cannot generate",
+    "i can't generate",
+    "not appropriate",
+    "not able to comply"
+  ];
+  
+  // Check if response contains any guardrail phrase
+  return guardrailPhrases.some(phrase => lowerResponse.includes(phrase));
+}
+
 // Chat endpoint
 app.post('/api/chat', async (req, res) => {
   try {
@@ -277,8 +318,14 @@ Remember: You're having a conversation, not giving a comprehensive answer. Less 
       presence_penalty: 0
     });
 
-    const response = completion.choices[0].message.content;
+    let response = completion.choices[0].message.content;
     const usage = completion.usage;
+    
+    // Check if response is a guardrail/refusal and replace with standardized message
+    if (detectGuardrailResponse(response)) {
+      console.log('🛡️ GUARDRAIL DETECTED - Replacing with standardized message');
+      response = "I'm sorry, but I can't assist with that.";
+    }
     
     // Log usage for monitoring (in production, you might want to store this in a database)
     console.log(`API call completed - Tokens used: ${usage.total_tokens}, Model: gpt-4o-mini`);

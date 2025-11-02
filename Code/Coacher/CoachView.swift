@@ -239,6 +239,8 @@ struct CoachView: View {
                                 colorScheme: colorScheme
                             )
                             .frame(height: 36)
+                            .frame(maxWidth: .infinity) // Allow text field to take available space
+                            .layoutPriority(1) // Give text field priority in layout
                             .opacity(hybridManager.isModelLoaded ? 1.0 : 0.6)
                             .onSubmit {
                                 if hybridManager.isModelLoaded && !hybridManager.isLoading {
@@ -262,8 +264,10 @@ struct CoachView: View {
                                 !hybridManager.isModelLoaded || 
                                 hybridManager.isLoading
                             )
+                            .fixedSize() // Prevent button from shrinking
                         }
                         .padding(.horizontal, 4)
+                        .fixedSize(horizontal: false, vertical: true) // Prevent horizontal overflow
                         
                     }
                     .padding(.horizontal, 16)
@@ -482,6 +486,16 @@ struct CustomTextField: UIViewRepresentable {
         textField.delegate = context.coordinator
         textField.returnKeyType = .default
         textField.font = UIFont.preferredFont(forTextStyle: .body)
+        
+        // Configure text field to handle long text properly
+        textField.adjustsFontSizeToFitWidth = false
+        textField.contentHorizontalAlignment = .left
+        textField.contentVerticalAlignment = .center
+        
+        // Set compression resistance to prevent layout issues
+        textField.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+        textField.setContentHuggingPriority(.defaultLow, for: .horizontal)
+        
         updatePlaceholderColor(textField)
         return textField
     }
