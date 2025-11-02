@@ -30,7 +30,61 @@ struct SettingsView: View {
     var body: some View {
         NavigationView {
             List {
-                Section("Reminders") {
+                remindersSection
+                
+                widgetSection
+                
+                aiCoachComingSoonSection
+                
+                personalizationSection
+                
+                aiConfigurationSection
+                
+                gamificationSection
+                
+                aiCoachModelSection
+                
+                dataPrivacySection
+                
+                aboutSection
+                
+                legalSection
+            }
+            .navigationTitle("Settings")
+            .background(
+                Color.appBackground
+                    .ignoresSafeArea(.all)
+            )
+            .scrollContentBackground(.hidden)
+            .scrollDismissesKeyboard(.immediately)
+            .onTapGesture {
+                hideKeyboard()
+            }
+            .onAppear {
+                loadSavedTimes()
+            }
+            .sheet(isPresented: $showWidgetGuide) {
+                WidgetInstallationGuideView()
+            }
+            .onChange(of: nightPrepTime) { _, newValue in
+                UserDefaults.standard.set(newValue, forKey: "nightPrepTime")
+            }
+            .onChange(of: morningFocusTime) { _, newValue in
+                UserDefaults.standard.set(newValue, forKey: "morningFocusTime")
+            }
+        }
+        .fullScreenCover(isPresented: $showOnboarding) {
+            OnboardingView(isPresented: $showOnboarding)
+                .onAppear {
+                    print("🔄 DEBUG: OnboardingView fullScreenCover appeared")
+                }
+        }
+    }
+    
+    // MARK: - Section Views
+    
+    private var remindersSection: some View {
+        Section("Reminders") {
                     Toggle("Night Prep Reminder", isOn: $nightPrepReminder)
                         .onChange(of: nightPrepReminder) { _, _ in
                             Task {
@@ -60,11 +114,11 @@ struct SettingsView: View {
                                 }
                             }
                     }
-                    
-
                 }
-                
-                Section(header: Text("Home Screen Widget")) {
+    }
+    
+    private var widgetSection: some View {
+        Section(header: Text("Home Screen Widget")) {
                     Button(action: { showWidgetGuide = true }) {
                         HStack {
                             Image(systemName: "square.grid.2x2")
@@ -79,23 +133,27 @@ struct SettingsView: View {
                     .accessibilityLabel("How to add widget")
                     .accessibilityHint("Opens guide for adding home screen widget")
                 }
-                
-                Section("AI Coach") {
-                    VStack(alignment: .leading, spacing: 8) {
-                        HStack {
-                            Image(systemName: "brain.head.profile")
-                                .foregroundColor(.blue)
-                            Text("Coming Soon")
-                                .font(.headline)
-                        }
-                        Text("Your AI coach will be available soon to help guide you on your wellness journey.")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                    }
-                    .padding(.vertical, 4)
+    }
+    
+    private var aiCoachComingSoonSection: some View {
+        Section("AI Coach") {
+            VStack(alignment: .leading, spacing: 8) {
+                HStack {
+                    Image(systemName: "brain.head.profile")
+                        .foregroundColor(.blue)
+                    Text("Coming Soon")
+                        .font(.headline)
                 }
-                
-                Section("Personalization") {
+                Text("Your AI coach will be available soon to help guide you on your wellness journey.")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+            .padding(.vertical, 4)
+        }
+    }
+    
+    private var personalizationSection: some View {
+        Section("Personalization") {
                     HStack {
                         Text("Name")
                         Spacer()
@@ -122,8 +180,10 @@ struct SettingsView: View {
                     .accessibilityLabel("Replay Onboarding")
                     .accessibilityHint("Restart the app introduction and setup process")
                 }
-                
-                Section {
+    }
+    
+    private var aiConfigurationSection: some View {
+        Section {
                     Button(action: {
                         showAdvancedAISettings.toggle()
                     }) {
@@ -183,8 +243,10 @@ struct SettingsView: View {
                 } header: {
                     Text("AI Configuration")
                 }
-                
-                Section("Gamification") {
+    }
+    
+    private var gamificationSection: some View {
+        Section("Gamification") {
                     Toggle("Show animations", isOn: $celebrationManager.animationsEnabled)
                     
                     Toggle("Show streak widgets", isOn: $showStreakWidgets)
@@ -203,8 +265,10 @@ struct SettingsView: View {
                         .foregroundStyle(.red)
                     }
                 }
-                
-                Section("AI Coach") {
+    }
+    
+    private var aiCoachModelSection: some View {
+        Section("AI Coach") {
                     HStack {
                         Text("Model Status")
                         Spacer()
@@ -243,8 +307,10 @@ struct SettingsView: View {
                             .font(.caption)
                     }
                 }
-                
-                Section("Data & Privacy") {
+    }
+    
+    private var dataPrivacySection: some View {
+        Section("Data & Privacy") {
                     Button("Export data") {
                         exportData()
                     }
@@ -260,8 +326,10 @@ struct SettingsView: View {
                     }
                     .foregroundStyle(.red)
                 }
-                
-                Section("About") {
+    }
+    
+    private var aboutSection: some View {
+        Section("About") {
                     HStack {
                         Text("Version")
                         Spacer()
@@ -276,69 +344,46 @@ struct SettingsView: View {
                             .foregroundStyle(.secondary)
                     }
                     
-                    Link("Privacy Policy", destination: URL(string: "https://www.lightertomorrow.com/privacy-policy.html")!)
+                    Link("Privacy Policy", destination: URL(string: "https://www.lightertomorrow.com/public/privacy-policy.html")!)
                         .foregroundColor(.brandBlue)
                     
-                    Link("Terms of Service", destination: URL(string: "https://www.lightertomorrow.com/terms-of-service.html")!)
+                    Link("Terms of Service", destination: URL(string: "https://www.lightertomorrow.com/public/terms-of-service.html")!)
                         .foregroundColor(.brandBlue)
                 }
-                
-                Section("Legal") {
-                    Text("AI Disclaimer")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                } footer: {
-                    Text("AI-generated responses may contain errors or inaccuracies. This app provides wellness coaching for informational purposes only and is not a substitute for professional medical, mental health, or therapeutic advice. Always consult qualified healthcare providers for medical concerns.")
-                        .font(.caption2)
-                        .foregroundStyle(.secondary)
-                        .padding(.top, 4)
-                }
-            }
-            .navigationTitle("Settings")
-            .background(
-                Color.appBackground
-                    .ignoresSafeArea(.all)
-            )
-            .scrollContentBackground(.hidden)
-            .scrollDismissesKeyboard(.immediately)
-            .onTapGesture {
-                hideKeyboard()
-            }
-            .onAppear {
-                // Load saved times from UserDefaults
-                if let savedNightTime = UserDefaults.standard.object(forKey: "nightPrepTime") as? Date {
-                    nightPrepTime = savedNightTime
-                } else {
-                    // Set default time if not saved
-                    let calendar = Calendar.current
-                    let defaultNightTime = calendar.date(from: DateComponents(hour: 21, minute: 0)) ?? Date()
-                    nightPrepTime = defaultNightTime
-                }
-                
-                if let savedMorningTime = UserDefaults.standard.object(forKey: "morningFocusTime") as? Date {
-                    morningFocusTime = savedMorningTime
-                } else {
-                    // Set default time if not saved
-                    let calendar = Calendar.current
-                    let defaultMorningTime = calendar.date(from: DateComponents(hour: 8, minute: 0)) ?? Date()
-                    morningFocusTime = defaultMorningTime
-                }
-            }
-            .sheet(isPresented: $showWidgetGuide) {
-                WidgetInstallationGuideView()
-            }
-            .onChange(of: nightPrepTime) { _, newValue in
-                UserDefaults.standard.set(newValue, forKey: "nightPrepTime")
-            }
-            .onChange(of: morningFocusTime) { _, newValue in
-                UserDefaults.standard.set(newValue, forKey: "morningFocusTime")
-            }
+    }
+    
+    private var legalSection: some View {
+        Section {
+            Text("AI Disclaimer")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+        } header: {
+            Text("Legal")
+        } footer: {
+            Text("AI-generated responses may contain errors or inaccuracies. This app provides wellness coaching for informational purposes only and is not a substitute for professional medical, mental health, or therapeutic advice. Always consult qualified healthcare providers for medical concerns.")
+                .font(.caption2)
+                .foregroundStyle(.secondary)
+                .padding(.top, 4)
         }
-        .fullScreenCover(isPresented: $showOnboarding) {
-            OnboardingView(isPresented: $showOnboarding)
-                .onAppear {
-                    print("🔄 DEBUG: OnboardingView fullScreenCover appeared")
-                }
+    }
+    
+    // MARK: - Helper Methods
+    
+    private func loadSavedTimes() {
+        if let savedNightTime = UserDefaults.standard.object(forKey: "nightPrepTime") as? Date {
+            nightPrepTime = savedNightTime
+        } else {
+            let calendar = Calendar.current
+            let defaultNightTime = calendar.date(from: DateComponents(hour: 21, minute: 0)) ?? Date()
+            nightPrepTime = defaultNightTime
+        }
+        
+        if let savedMorningTime = UserDefaults.standard.object(forKey: "morningFocusTime") as? Date {
+            morningFocusTime = savedMorningTime
+        } else {
+            let calendar = Calendar.current
+            let defaultMorningTime = calendar.date(from: DateComponents(hour: 8, minute: 0)) ?? Date()
+            morningFocusTime = defaultMorningTime
         }
     }
     
