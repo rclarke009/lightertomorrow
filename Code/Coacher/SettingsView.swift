@@ -275,6 +275,23 @@ struct SettingsView: View {
                         Text("1")
                             .foregroundStyle(.secondary)
                     }
+                    
+                    Link("Privacy Policy", destination: URL(string: "https://www.lightertomorrow.com/privacy-policy.html")!)
+                        .foregroundColor(.brandBlue)
+                    
+                    Link("Terms of Service", destination: URL(string: "https://www.lightertomorrow.com/terms-of-service.html")!)
+                        .foregroundColor(.brandBlue)
+                }
+                
+                Section("Legal") {
+                    Text("AI Disclaimer")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                } footer: {
+                    Text("AI-generated responses may contain errors or inaccuracies. This app provides wellness coaching for informational purposes only and is not a substitute for professional medical, mental health, or therapeutic advice. Always consult qualified healthcare providers for medical concerns.")
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                        .padding(.top, 4)
                 }
             }
             .navigationTitle("Settings")

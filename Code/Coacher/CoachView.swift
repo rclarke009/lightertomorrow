@@ -210,6 +210,14 @@ struct CoachView: View {
                                 }
                             }
                         }
+                        .onChange(of: hybridManager.isGeneratingResponse) { _, isGenerating in
+                            // Auto-scroll to show the "Thinking..." spinner when AI starts generating
+                            if isGenerating {
+                                withAnimation(.easeInOut(duration: 0.3)) {
+                                    proxy.scrollTo("generating", anchor: .bottom)
+                                }
+                            }
+                        }
                     }
                     
                     // Message Input
