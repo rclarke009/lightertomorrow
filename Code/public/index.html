@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Lighter Tomorrow — Plan tonight, thrive tomorrow</title>
+  <meta name="description" content="Lighter Tomorrow helps you build healthier eating habits through simple nightly prep and a short morning reflection—no calorie counting or weigh‑ins." />
+  <meta property="og:title" content="Lighter Tomorrow" />
+  <meta property="og:description" content="Plan tonight, thrive tomorrow. Mindset-first weight loss: quick nightly prep, calm mornings, and kinder choices—bite by bite." />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="/og-image.jpg" />
+  <meta name="theme-color" content="#0d4b6e" />
+  <link rel="icon" href="/favicon.ico" />
+  <style>
+    :root{
+      --bg:#f7fbff;         /* soft blue-tinted background */
+      --paper:#ffffff;      /* cards */
+      --ink:#0b2533;        /* primary text */
+      --muted:#5b7686;      /* secondary text */
+      --brand:#0d79b9;      /* CTA + accents */
+      --brand-ink:#ffffff;  /* CTA text */
+      --ring:#7fd3ff;       /* subtle focus ring */
+      --ok:#2bb673;         /* success */
+      --shadow: 0 10px 30px rgba(11,37,51,.08);
+      --radius: 16px;
+      --radius-lg: 20px;
+      --max: 1120px;
+    }
+    html,body{height:100%}
+    body{
+      margin:0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      color:var(--ink); background:var(--bg); line-height:1.6;
+      text-rendering:optimizeLegibility; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
+    }
+    a{color:var(--brand); text-decoration:none}
+    a:hover{opacity:.9}
+    .wrap{max-width:var(--max); margin:0 auto; padding:0 20px}
+    header{
+      position:sticky; top:0; z-index:50; backdrop-filter:saturate(1.2) blur(6px);
+      background:linear-gradient(180deg, rgba(247,251,255,.92), rgba(247,251,255,.6));
+      border-bottom:1px solid rgba(13,73,110,.08);
+    }
+    .nav{display:flex; align-items:center; justify-content:space-between; padding:14px 0}
+    .brand{display:flex; align-items:center; gap:12px}
+    .logo{width:36px; height:36px; border-radius:9px; box-shadow: var(--shadow)}
+    .brand h1{font-size:18px; margin:0}
+    .nav a.btn{margin-left:12px}
+
+    .btn{display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:12px 18px; border-radius:999px; border:1px solid rgba(13,73,110,.12); font-weight:600}
+    .btn.primary{background:var(--brand); color:var(--brand-ink); border-color:transparent}
+    .btn.ghost{background:transparent; color:var(--ink)}
+    .btn:hover{transform:translateY(-1px); box-shadow:0 8px 20px rgba(13,121,185,.18)}
+    .btn:focus-visible{outline:3px solid var(--ring); outline-offset:2px}
+
+    /* HERO */
+    .hero{padding:64px 0 24px}
+    .hero-grid{display:grid; grid-template-columns:1.1fr .9fr; gap:36px; align-items:center}
+    .hero h2{font-size: clamp(28px, 4vw, 48px); line-height:1.1; margin:8px 0}
+    .hero p{font-size:clamp(16px, 2vw, 18px); color:var(--muted); margin:0 0 18px}
+    .note{display:inline-flex; align-items:center; gap:8px; background:#e8f6ff; color:#0d4b6e; padding:6px 12px; border-radius:999px; font-weight:600}
+    .hero-card{background:var(--paper); border-radius:var(--radius-lg); box-shadow:var(--shadow); padding:22px}
+    .phone{width:100%; aspect-ratio: 10/19; border-radius:26px; background: radial-gradient(120% 120% at 0% 0%, #e9f7ff, #e7fbf2 60%, #fff 100%); border:10px solid #111; position:relative; overflow:hidden}
+    .screen{position:absolute; inset:12px; border-radius:18px; background:white; box-shadow: inset 0 0 0 1px rgba(0,0,0,.04)}
+    .spark{position:absolute; width:9px; height:9px; border-radius:50%; background:conic-gradient(from 0deg,#7fd3ff,#2bb673,#7fd3ff); animation:spark 2.8s linear infinite}
+    @keyframes spark { to { transform: rotate(1turn) translate(120px) rotate(-1turn) } }
+    .sprout{position:absolute; bottom:20px; left:50%; transform:translateX(-50%); width:120px; height:120px}
+    .sprout .stem{position:absolute; bottom:0; left:50%; width:6px; height:70px; background:linear-gradient(#2bb673,#0e8c54); border-radius:999px; transform:translateX(-50%)}
+    .sprout .leaf{position:absolute; bottom:50px; width:46px; height:26px; background:radial-gradient(120% 120% at 10% 10%, #9be3bf, #2bb673); border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%; animation:wave 2.4s ease-in-out infinite}
+    .sprout .leaf.left{left:50%; transform-origin:right bottom; transform: translate(-56%, 0) rotate(-18deg)}
+    .sprout .leaf.right{left:50%; transform-origin:left bottom; transform: translate(10%, 0) rotate(18deg); animation-delay:1.2s}
+    @keyframes wave { 0%,100%{ transform:translateX(0) rotate(0deg)} 50%{ transform:translateX(2px) rotate(4deg)} }
+
+    /* SECTIONS */
+    section{padding:64px 0}
+    .grid-3{display:grid; grid-template-columns: repeat(3, 1fr); gap:22px}
+    .card{background:var(--paper); border-radius:var(--radius); padding:22px; box-shadow:var(--shadow)}
+    .card h3{margin:0 0 8px}
+    .muted{color:var(--muted)}
+
+    .how .step{display:flex; gap:14px}
+    .how .dot{flex:0 0 34px; height:34px; border-radius:50%; background:#e8f6ff; display:grid; place-items:center; font-weight:700; color:#0d4b6e}
+
+    .cta{
+      background: radial-gradient(140% 120% at 10% 10%, #e9f7ff, #f7fff9 60%, #ffffff 100%);
+      border:1px solid rgba(13,73,110,.06);
+      border-radius:var(--radius-lg);
+      padding:28px; display:flex; align-items:center; justify-content:space-between; gap:20px; flex-wrap:wrap
+    }
+    .cta form{display:flex; gap:10px; flex-wrap:wrap}
+    input[type=email]{
+      width: min(420px, 80vw);
+      padding:14px 16px; border-radius:999px; border:1px solid rgba(13,73,110,.18);
+      font-size:16px; outline:none
+    }
+    input[type=email]:focus{border-color:#0d79b9; box-shadow:0 0 0 4px rgba(127,211,255,.35)}
+
+    .foot{padding:36px 0; color:var(--muted); font-size:14px}
+    .foot .links{display:flex; gap:16px; flex-wrap:wrap}
+
+    /* responsive */
+    @media (max-width: 960px){ .hero-grid{grid-template-columns:1fr} }
+    @media (max-width: 720px){ .grid-3{grid-template-columns:1fr} }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap nav" role="navigation" aria-label="Main">
+      <div class="brand">
+        <img src="images/lighter-tomorrow-app-icon.png" alt="Lighter Tomorrow App Icon" class="logo" width="36" height="36">
+        <h1>Lighter Tomorrow</h1>
+      </div>
+      <div>
+        <a class="btn ghost" href="#how">How it works</a>
+        <a class="btn ghost" href="#faq">FAQ</a>
+        <a class="btn primary" href="#waitlist">Join the waitlist</a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- HERO -->
+    <section class="hero">
+      <div class="wrap hero-grid">
+        <div>
+          <span class="note">Mindset‑first • No calorie counting</span>
+          <h2>Plan tonight, thrive tomorrow.</h2>
+          <p>Lighter Tomorrow helps you build healthier habits with a 60‑second nightly prep and a short morning reflection. No food logging. No weigh‑ins. Just kinder choices—bite by bite.</p>
+          <div style="display:flex; gap:12px; flex-wrap:wrap; margin:18px 0 8px">
+            <a class="btn primary" href="#waitlist">Get early access</a>
+            <a class="btn" href="#how">See how it works</a>
+          </div>
+          <p class="muted" style="margin-top:8px">Loved by busy people who want simple, sustainable progress.</p>
+        </div>
+
+        <div class="hero-card" aria-label="App preview">
+          <div class="phone" role="img" aria-label="Animated celebration and sprout">
+            <div class="screen"></div>
+            <div class="spark" style="top:50%; left:50%"></div>
+            <div class="sprout" aria-hidden="true">
+              <div class="stem"></div>
+              <div class="leaf left"></div>
+              <div class="leaf right"></div>
+            </div>
+          </div>
+          <p class="muted" style="margin:12px 2px 0">Tiny wins get tiny celebrations. Keep a 3‑ or 7‑day streak to unlock bigger moments ✨</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- WHY IT WORKS / VALUE PROPS -->
+    <section>
+      <div class="wrap grid-3">
+        <div class="card">
+          <h3>Nightly prep in 60s</h3>
+          <p class="muted">Pick one easy swap for tomorrow (e.g., water before coffee). Decide once—avoid decision fatigue.</p>
+        </div>
+        <div class="card">
+          <h3>Morning mindset</h3>
+          <p class="muted">Reconnect to your why with a short prompt. Start steady, stay steady.</p>
+        </div>
+        <div class="card">
+          <h3>Kind accountability</h3>
+          <p class="muted">Gentle nudges and encouraging messages keep momentum going—never shaming.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- HOW IT WORKS -->
+    <section id="how" class="how">
+      <div class="wrap">
+        <h2>How it works</h2>
+        <div class="grid-3" style="margin-top:16px">
+          <div class="card step">
+            <div class="dot">1</div>
+            <div>
+              <h3>Choose a quick swap</h3>
+              <p class="muted">At night, pick one small action for tomorrow. Keep it easy and winnable.</p>
+            </div>
+          </div>
+          <div class="card step">
+            <div class="dot">2</div>
+            <div>
+              <h3>Start with intention</h3>
+              <p class="muted">In the morning, reflect for 30–60 seconds. Calm beats chaos.</p>
+            </div>
+          </div>
+          <div class="card step">
+            <div class="dot">3</div>
+            <div>
+              <h3>Tap “I did my swap”</h3>
+              <p class="muted">Enjoy a small celebration. Streaks unlock special animations.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SOCIAL PROOF / QUOTES -->
+    <section>
+      <div class="wrap grid-3">
+        <blockquote class="card">
+          “It’s the first app that didn’t make me feel bad. I just keep showing up—and it’s working.”
+          <div class="muted" style="margin-top:8px">— Beta tester</div>
+        </blockquote>
+        <blockquote class="card">
+          “Nightly prep is my favorite 60 seconds of the day. I wake up already decided.”
+          <div class="muted" style="margin-top:8px">— Early user</div>
+        </blockquote>
+        <blockquote class="card">
+          “Bite by bite feels doable. I’ve kept a 14‑day streak for the first time in years.”
+          <div class="muted" style="margin-top:8px">— Tester</div>
+        </blockquote>
+      </div>
+    </section>
+
+    <!-- EMAIL CAPTURE / CTA -->
+    <section id="waitlist">
+      <div class="wrap cta">
+        <div>
+          <h3>Be first to know when we launch</h3>
+          <p class="muted" style="margin:6px 0 0">Join the waitlist for early access and a founder‑member perk.</p>
+        </div>
+        <form action="#" method="post" onsubmit="event.preventDefault(); subscribed();">
+          <label class="visually-hidden" for="email">Email</label>
+          <input id="email" type="email" name="email" placeholder="you@example.com" required />
+          <button class="btn primary" type="submit">Join waitlist</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section id="faq">
+      <div class="wrap">
+        <h2>FAQ</h2>
+        <details class="card" style="margin-top:12px"><summary><strong>Do I have to track calories or weigh myself?</strong></summary>
+          <p class="muted">Nope. Lighter Tomorrow focuses on tiny choices, not numbers. If you want to track elsewhere, that’s up to you.</p>
+        </details>
+        <details class="card" style="margin-top:12px"><summary><strong>What if I miss a day?</strong></summary>
+          <p class="muted">You’re human. The app meets you with compassion—pick a small swap tonight and begin again tomorrow.</p>
+        </details>
+        <details class="card" style="margin-top:12px"><summary><strong>Is this for specific diets?</strong></summary>
+          <p class="muted">No. It’s diet‑agnostic and compatible with your preferences or restrictions.</p>
+        </details>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <div class="wrap">
+      <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:24px">
+        <div>© <span id="year"></span> Lighter Tomorrow</div>
+        <div class="links">
+          <a href="/privacy-policy.html">Privacy</a>
+          <a href="/terms-of-service.html">Terms</a>
+          <a href="mailto:hello@lightertomorrow.com">Contact</a>
+        </div>
+      </div>
+      
+      <!-- Privacy Disclosure -->
+      <div id="privacy-disclosure" class="privacy-content" style="display:none; max-width:800px; line-height:1.7">
+        <h4 style="margin:0 0 16px; color:var(--ink)">Data Types Collected</h4>
+        
+        <div style="margin-bottom:20px">
+          <h5 style="margin:0 0 8px; color:var(--ink)">Health & Fitness</h5>
+          <p class="muted" style="margin:0 0 8px">User-entered goals, reflections, and habits</p>
+          <p class="muted" style="font-size:14px; margin:0">(e.g., Night Prep checklist, Morning Focus "why," swap choice, End-of-Day notes)</p>
+        </div>
+        
+        <div style="margin-bottom:20px">
+          <h5 style="margin:0 0 8px; color:var(--ink)">Audio (Optional)</h5>
+          <p class="muted" style="margin:0 0 8px">Voice notes if the user chooses to record.</p>
+          <p class="muted" style="font-size:14px; margin:0">By default, audio is not saved — only on-device transcription. Users can enable "Keep Audio" in Settings.</p>
+        </div>
+        
+        <div style="margin-bottom:20px">
+          <h5 style="margin:0 0 8px; color:var(--ink)">Identifiers</h5>
+          <p class="muted" style="margin:0 0 8px">Device ID for iCloud sync only.</p>
+          <p class="muted" style="font-size:14px; margin:0">No advertising IDs or third-party trackers.</p>
+        </div>
+        
+        <h4 style="margin:32px 0 16px; color:var(--ink)">Data Linked to the User</h4>
+        <div style="margin-bottom:20px">
+          <p class="muted" style="margin:0 0 8px"><strong>Yes, if iCloud Sync is enabled:</strong> Daily entries and settings sync to the user's private iCloud account.</p>
+          <p class="muted" style="margin:0 0 8px"><strong>No, if iCloud Sync is off:</strong> All data remains on the device only.</p>
+        </div>
+        
+        <h4 style="margin:32px 0 16px; color:var(--ink)">Data Not Collected</h4>
+        <div style="margin-bottom:20px">
+          <p class="muted" style="margin:0 0 8px">• No contact info (name, email, phone)</p>
+          <p class="muted" style="margin:0 0 8px">• No location data</p>
+          <p class="muted" style="margin:0 0 8px">• No browsing history</p>
+          <p class="muted" style="margin:0 0 8px">• No purchase or financial info</p>
+          <p class="muted" style="margin:0 0 8px">• No third-party tracking</p>
+        </div>
+        
+        <h4 style="margin:32px 0 16px; color:var(--ink)">Data Use</h4>
+        <div style="margin-bottom:20px">
+          <p class="muted" style="margin:0 0 8px"><strong>App Functionality</strong> – Daily habit tracking, reminders, coach responses.</p>
+          <p class="muted" style="margin:0 0 8px"><strong>Analytics</strong> – None collected.</p>
+          <p class="muted" style="margin:0 0 8px"><strong>Developer Advertising or Marketing</strong> – None.</p>
+        </div>
+        
+        <h4 style="margin:32px 0 16px; color:var(--ink)">Third-Party Access</h4>
+        <div style="margin-bottom:20px">
+          <p class="muted" style="margin:0 0 8px"><strong>None.</strong></p>
+          <p class="muted" style="margin:0 0 8px">The app does not share data with advertisers, analytics platforms, or other third parties.</p>
+        </div>
+        
+        <h4 style="margin:32px 0 16px; color:var(--ink)">Storage & Security</h4>
+        <div style="margin-bottom:20px">
+          <p class="muted" style="margin:0 0 8px">• All entries are stored locally on the device by default.</p>
+          <p class="muted" style="margin:0 0 8px">• iCloud sync (if enabled) uses Apple's secure CloudKit infrastructure.</p>
+          <p class="muted" style="margin:0 0 8px">• Users can delete their entries or reset achievements at any time in Settings.</p>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Set current year
+    document.getElementById('year').textContent = new Date().getFullYear();
+    // Fake subscribe handler
+    function subscribed(){
+      const btn = document.querySelector('button[type=submit]');
+      btn.textContent = 'You’re on the list!';
+      btn.classList.add('ok');
+      btn.style.background = 'var(--ok)';
+      btn.style.boxShadow = '0 8px 20px rgba(43,182,115,.25)';
+    }
+    
+    // Privacy disclosure toggle
+    function togglePrivacy(event) {
+      event.preventDefault();
+      const disclosure = document.getElementById('privacy-disclosure');
+      const isVisible = disclosure.style.display !== 'none';
+      disclosure.style.display = isVisible ? 'none' : 'block';
+    }
+  </script>
+</body>
+</html>
