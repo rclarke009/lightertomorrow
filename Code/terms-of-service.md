@@ -120,7 +120,7 @@ These Terms shall be governed by and construed in accordance with the laws of Fl
 
 ## Dispute Resolution
 
-Any disputes arising out of or relating to these Terms or the App shall be resolved through binding arbitration in accordance with the rules of [Arbitration Organization], unless otherwise required by law.
+Any disputes arising out of or relating to these Terms or the App shall be resolved through binding arbitration in accordance with the rules of an Arbitration Organization, unless otherwise required by law.
 
 ## Severability
 

@@ -379,16 +379,16 @@ struct CareFirstMorningFocusSection: View {
                             .fontWeight(.bold)
                             .foregroundColor(.white)
                     }
-                    Text("Reconnect With Your Identity")
+                    Text("Remind Yourself Who You're Becoming")
                         .font(.headline)
                         .fontWeight(.semibold)
                 }
                 
-                Text("Complete this sentence:")
+                Text("Complete this thought:")
                     .font(.subheadline)
                     .foregroundColor(.secondary)
                 
-                Text("I am someone who...")
+                Text("Today I want to be the kind of person who…")
                     .font(.title3)
                     .fontWeight(.medium)
                     .foregroundColor(colorScheme == .dark ? .white : .helpButtonBlue)
@@ -410,12 +410,12 @@ struct CareFirstMorningFocusSection: View {
                             RoundedRectangle(cornerRadius: 14)
                                 .strokeBorder(Color(.systemGray2), lineWidth: 0.5)
                         )
-                        .accessibilityLabel("Identity Statement")
-                        .accessibilityHint("Complete the sentence: I am someone who...")
+                        .accessibilityLabel("Who You're Becoming")
+                        .accessibilityHint("Complete the thought: Today I want to be the kind of person who…")
                     
                     // Show placeholder text only when field is empty
                     if entry.identityStatement?.isEmpty != false {
-                        Text("Example: \"I am someone who builds strength and calm in my body.\"")
+                        Text("Example: \"Today I want to be the kind of person who takes care of my body and stays calm.\"")
                             .foregroundColor(.secondary)
                             .padding(.top, 8)
                             .padding(.leading, 4)
@@ -506,18 +506,18 @@ struct CareFirstMorningFocusSection: View {
                             .fontWeight(.bold)
                             .foregroundColor(.white)
                     }
-                    Text("Plan Your Stress Response")
+                    Text("Plan Your Response")
                         .font(.headline)
                         .fontWeight(.semibold)
                 }
                 
-                Text("When stress or cravings hit, what will you do to give your body relief or energy?")
+                Text("When a difficult moment hits today — stress, boredom, or anything else — how will you care for yourself first?")
                     .font(.subheadline)
                     .foregroundColor(.secondary)
             }
             
             VStack(alignment: .leading, spacing: 12) {
-                Text("If I feel stressed or want comfort, I will...")
+                Text("If I feel off or pulled off-track, I will…")
                     .font(.subheadline)
                     .fontWeight(.medium)
                 
@@ -538,11 +538,11 @@ struct CareFirstMorningFocusSection: View {
                             RoundedRectangle(cornerRadius: 14)
                                 .strokeBorder(Color(.systemGray2), lineWidth: 0.5)
                         )
-                        .accessibilityLabel("Stress Response")
-                        .accessibilityHint("What will you do when stressed or wanting comfort?")
+                        .accessibilityLabel("Challenge Response")
+                        .accessibilityHint("What will you do when a difficult moment hits?")
                     
                     if entry.stressResponse.isEmpty {
-                        Text("Examples: dance to one song, wrap in a blanket and do 3 breaths, go stand in the sun for 3 minutes")
+                        Text("Examples: dance to one song, text a friend, go stand in the sun for 3 minutes")
                             .foregroundColor(.secondary)
                             .padding(.top, 8)
                             .padding(.leading, 4)

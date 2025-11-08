@@ -155,6 +155,7 @@ struct TodayView: View {
             .onReceive(NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)) { _ in
                 // Refresh data when app becomes active to show current day's data
                 loadOrCreateToday()
+                checkMorningCompletionToday() // Refresh morning completion status when app becomes active
                 // Don't reset expansion states - only reset on actual app launch
             }
 
