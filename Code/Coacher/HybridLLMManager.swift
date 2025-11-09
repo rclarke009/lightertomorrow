@@ -10,12 +10,10 @@ class HybridLLMManager: ObservableObject {
     @Published var isGeneratingResponse = false
     @Published var errorMessage: String?
     @Published var chatHistory: [LLMMessage] = []
-    @Published var isUsingCloudAI = false
-    @AppStorage("useCloudAI") private var useCloudAI = false
+    @Published var isUsingCloudAI = true
     @Published var currentConversationId: UUID
     
     // Managers
-    private let localManager = MLXLLMManager()
     private let cloudManager = BackendLLMManager()
     
     // Configuration
@@ -24,13 +22,7 @@ class HybridLLMManager: ObservableObject {
     init() {
         chatHistory = []
         currentConversationId = UUID() // Initialize with first conversation ID
-        // Force cloud AI if coaching feature is enabled (local AI is disabled)
-        if FeatureFlags.enableCoaching {
-            useCloudAI = true
-            isUsingCloudAI = true
-        } else {
-            isUsingCloudAI = useCloudAI
-        }
+        isUsingCloudAI = true
     }
     
     // MARK: - Model Management
@@ -44,37 +36,13 @@ class HybridLLMManager: ObservableObject {
             isModelLoaded = false
         }
         
-        if self.isUsingCloudAI {
-            print("🔄 HybridLLMManager: Loading ONLINE AI mode...")
-            print("🔄 HybridLLMManager: Checking cloud AI connectivity...")
-            // No loading state for online AI - just check connectivity
-            await self.cloudManager.loadModel()
-            await MainActor.run {
-                self.isModelLoaded = self.cloudManager.isModelLoaded
-                self.errorMessage = self.cloudManager.errorMessage
-                print("🔄 HybridLLMManager: Cloud AI ready - isModelLoaded: \(self.isModelLoaded)")
-            }
-        } else {
-            print("🔄 HybridLLMManager: Loading LOCAL AI mode...")
-            await MainActor.run {
-                self.isLoading = true
-                print("🔄 HybridLLMManager: isLoading set to true for local AI")
-            }
-            
-            // Add timeout handling for local AI model loading
-            await withTimeout(seconds: 30) {
-                await self.localManager.loadModel()
-                await MainActor.run {
-                    self.isModelLoaded = self.localManager.isModelLoaded
-                    self.errorMessage = self.localManager.errorMessage
-                    print("🔄 HybridLLMManager: Local AI loaded - isModelLoaded: \(self.isModelLoaded)")
-                }
-            }
-            
-            await MainActor.run {
-                self.isLoading = false
-                print("🔄 HybridLLMManager: isLoading set to false, isModelLoaded: \(self.isModelLoaded)")
-            }
+        print("🔄 HybridLLMManager: Loading ONLINE AI mode...")
+        print("🔄 HybridLLMManager: Checking cloud AI connectivity...")
+        await self.cloudManager.loadModel()
+        await MainActor.run {
+            self.isModelLoaded = self.cloudManager.isModelLoaded
+            self.errorMessage = self.cloudManager.errorMessage
+            print("🔄 HybridLLMManager: Cloud AI ready - isModelLoaded: \(self.isModelLoaded)")
         }
     }
     
@@ -123,22 +91,14 @@ class HybridLLMManager: ObservableObject {
             isGeneratingResponse = true
         }
         
-        let response: String
+        let response = await cloudManager.generateResponse(for: userMessage, context: finalContext)
         
-        if isUsingCloudAI {
-            response = await cloudManager.generateResponse(for: userMessage, context: finalContext)
-            
-            // Check if we should show usage warning (only for cloud AI)
-            let usageTracker = UsageTracker.shared
-            if await usageTracker.shouldShowWarning() {
-                await MainActor.run {
-                    // Post notification to show warning
-                    NotificationCenter.default.post(name: NSNotification.Name("ShowUsageWarning"), object: nil)
-                }
-                await usageTracker.markWarningShown()
+        let usageTracker = UsageTracker.shared
+        if await usageTracker.shouldShowWarning() {
+            await MainActor.run {
+                NotificationCenter.default.post(name: NSNotification.Name("ShowUsageWarning"), object: nil)
             }
-        } else {
-            response = await localManager.generateResponse(for: userMessage, context: finalContext)
+            await usageTracker.markWarningShown()
         }
         
         // Save the message to our chat history (both in-memory and SwiftData)
@@ -154,32 +114,10 @@ class HybridLLMManager: ObservableObject {
     
     // MARK: - AI Mode Switching
     
-    /// Switch to local AI mode
-    func switchToLocalAI() async {
-        await MainActor.run {
-            isUsingCloudAI = false
-            useCloudAI = false
-            // Clear chat history when switching modes for privacy
-            chatHistory.removeAll()
-        }
-        await loadModel()
-    }
-    
     /// Switch to cloud AI mode
     func switchToCloudAI() async {
         await MainActor.run {
             isUsingCloudAI = true
-            useCloudAI = true
-            // Clear chat history when switching modes for privacy
-            chatHistory.removeAll()
-        }
-        await loadModel()
-    }
-    
-    /// Update AI mode based on user preference change
-    func updateAIMode() async {
-        await MainActor.run {
-            isUsingCloudAI = useCloudAI
             // Clear chat history when switching modes for privacy
             chatHistory.removeAll()
         }
@@ -422,7 +360,6 @@ class HybridLLMManager: ObservableObject {
     
     func clearError() {
         errorMessage = nil
-        localManager.clearError()
         cloudManager.clearError()
     }
     
@@ -433,7 +370,6 @@ class HybridLLMManager: ObservableObject {
             isModelLoaded = false
             chatHistory.removeAll()
         }
-        await localManager.unloadModel()
         await cloudManager.unloadModel()
     }
     

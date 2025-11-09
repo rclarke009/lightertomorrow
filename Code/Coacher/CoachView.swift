@@ -387,11 +387,6 @@ struct CoachView: View {
                 }
             }
         }
-        .onChange(of: hybridManager.isUsingCloudAI) { _, _ in
-            Task {
-                await hybridManager.updateAIMode()
-            }
-        }
     }
     
     // MARK: - Message Handling

@@ -7,7 +7,6 @@
 
 import SwiftUI
 import SwiftData
-import SafariServices
 
 struct SettingsView: View {
     @Environment(\.modelContext) private var context
@@ -26,8 +25,6 @@ struct SettingsView: View {
     @State private var nightPrepTime: Date = Date()
     @State private var morningFocusTime: Date = Date()
     @State private var showWidgetGuide = false
-    @State private var safariURL: URL?
-    @State private var showSafari = false
     
     var body: some View {
         NavigationView {
@@ -72,12 +69,6 @@ struct SettingsView: View {
                 .onAppear {
                     print("🔄 DEBUG: OnboardingView fullScreenCover appeared")
                 }
-        }
-        .sheet(isPresented: $showSafari) {
-            if let url = safariURL {
-                SafariView(url: url)
-                    .ignoresSafeArea()
-            }
         }
     }
     
@@ -205,17 +196,6 @@ struct SettingsView: View {
                             .foregroundStyle(.secondary)
                     }
                     
-                    Button("Privacy Policy") {
-                        safariURL = URL(string: "https://www.lightertomorrow.com/public/privacy-policy.html")
-                        showSafari = safariURL != nil
-                    }
-                    .foregroundColor(colorScheme == .dark ? .white : .brandBlue)
-                    
-                    Button("Terms of Service") {
-                        safariURL = URL(string: "https://www.lightertomorrow.com/public/terms-of-service.html")
-                        showSafari = safariURL != nil
-                    }
-                    .foregroundColor(colorScheme == .dark ? .white : .brandBlue)
                 }
     }
     
@@ -277,20 +257,6 @@ struct SettingsView: View {
     private func hideKeyboard() {
         UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
     }
-}
-
-// MARK: - Safari View
-
-private struct SafariView: UIViewControllerRepresentable {
-    let url: URL
-
-    func makeUIViewController(context: Context) -> SFSafariViewController {
-        let controller = SFSafariViewController(url: url)
-        controller.preferredControlTintColor = UIColor(Color.brandBlue)
-        return controller
-    }
-
-    func updateUIViewController(_ uiViewController: SFSafariViewController, context: Context) {}
 }
 
 #Preview {

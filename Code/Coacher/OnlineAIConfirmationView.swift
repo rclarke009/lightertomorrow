@@ -12,7 +12,6 @@ struct OnlineAIConfirmationView: View {
     @Environment(\.colorScheme) private var colorScheme
     @EnvironmentObject private var hybridManager: HybridLLMManager
     @State private var isEnabling = false
-    @State private var showLocalAIConfirmation = false
     
     var body: some View {
         NavigationView {
@@ -20,19 +19,17 @@ struct OnlineAIConfirmationView: View {
                 // Header
                 VStack(spacing: 16) {
                     // Blue Sparkle Icon
-                    Image(systemName: hybridManager.isUsingCloudAI ? "sparkles" : "sparkles")
+                    Image(systemName: "sparkles")
                         .font(.system(size: 48, weight: .medium))
-                        .foregroundColor(hybridManager.isUsingCloudAI ? .secondary : (colorScheme == .dark ? .white : .brandBlue))
+                        .foregroundColor(colorScheme == .dark ? .white : .brandBlue)
                         .symbolEffect(.pulse, options: .repeating)
                     
-                    Text(hybridManager.isUsingCloudAI ? "Switch to Local AI" : "Upgrade to Online AI")
+                    Text("Enhanced Online AI")
                         .font(.largeTitle)
                         .fontWeight(.bold)
                         .foregroundColor(colorScheme == .dark ? .white : .primary)
                     
-                    Text(hybridManager.isUsingCloudAI ? 
-                         "Switch back to your local AI model for complete privacy" :
-                         "Get access to the most advanced AI model for enhanced coaching")
+                    Text("Experience richer, more contextual coaching powered by our cloud-based AI.")
                         .font(.body)
                         .foregroundColor(.secondary)
                         .multilineTextAlignment(.center)
@@ -43,65 +40,33 @@ struct OnlineAIConfirmationView: View {
                 
                 // Features List
                 VStack(alignment: .leading, spacing: 12) {
-                    if hybridManager.isUsingCloudAI {
-                        // Local AI features
-                        FeatureRow(
-                            icon: "lock.fill",
-                            title: "Complete Privacy",
-                            description: "All data stays on your device",
-                            iconColor: colorScheme == .dark ? .white : .brandBlue
-                        )
-                        
-                        FeatureRow(
-                            icon: "wifi.slash",
-                            title: "No Internet Required",
-                            description: "Works offline anytime",
-                            iconColor: colorScheme == .dark ? .white : .brandBlue
-                        )
-                        
-                        FeatureRow(
-                            icon: "battery.100",
-                            title: "Battery Efficient",
-                            description: "Optimized for mobile devices",
-                            iconColor: colorScheme == .dark ? .white : .brandBlue
-                        )
-                        
-                        FeatureRow(
-                            icon: "checkmark.shield",
-                            title: "Always Available",
-                            description: "No server dependencies",
-                            iconColor: colorScheme == .dark ? .white : .brandBlue
-                        )
-                    } else {
-                        // Online AI features
-                        FeatureRow(
-                            icon: "brain.head.profile",
-                            title: "Advanced AI Model",
-                            description: "More intelligent and contextual responses",
-                            iconColor: colorScheme == .dark ? .white : .brandBlue
-                        )
-                        
-                        FeatureRow(
-                            icon: "bolt.fill",
-                            title: "Faster Responses",
-                            description: "Quick and efficient conversation flow",
-                            iconColor: colorScheme == .dark ? .white : .brandBlue
-                        )
-                        
-                        FeatureRow(
-                            icon: "globe",
-                            title: "Always Updated",
-                            description: "Latest AI capabilities and improvements",
-                            iconColor: colorScheme == .dark ? .white : .brandBlue
-                        )
-                        
-                        FeatureRow(
-                            icon: "lock.fill",
-                            title: "Secure & Private",
-                            description: "Your data is encrypted and protected",
-                            iconColor: colorScheme == .dark ? .white : .brandBlue
-                        )
-                    }
+                    FeatureRow(
+                        icon: "brain.head.profile",
+                        title: "Advanced AI Model",
+                        description: "More intelligent and contextual responses",
+                        iconColor: colorScheme == .dark ? .white : .brandBlue
+                    )
+                    
+                    FeatureRow(
+                        icon: "bolt.fill",
+                        title: "Faster Responses",
+                        description: "Quick and efficient conversation flow",
+                        iconColor: colorScheme == .dark ? .white : .brandBlue
+                    )
+                    
+                    FeatureRow(
+                        icon: "globe",
+                        title: "Always Updated",
+                        description: "Latest AI capabilities and improvements",
+                        iconColor: colorScheme == .dark ? .white : .brandBlue
+                    )
+                    
+                    FeatureRow(
+                        icon: "lock.fill",
+                        title: "Secure & Private",
+                        description: "Your data is encrypted and protected",
+                        iconColor: colorScheme == .dark ? .white : .brandBlue
+                    )
                 }
                 .padding()
                 .background(Color.cardBackground)
@@ -112,15 +77,13 @@ struct OnlineAIConfirmationView: View {
                 VStack(spacing: 8) {
                     HStack {
                         Image(systemName: "info.circle.fill")
-                            .foregroundColor(hybridManager.isUsingCloudAI ? .green : (colorScheme == .dark ? .white : .blue))
-                        Text(hybridManager.isUsingCloudAI ? "Privacy Benefits" : "Privacy Notice")
+                            .foregroundColor(colorScheme == .dark ? .white : .blue)
+                        Text("Privacy Notice")
                             .font(.headline)
                             .foregroundColor(colorScheme == .dark ? .white : .primary)
                     }
                     
-                    Text(hybridManager.isUsingCloudAI ? 
-                         "Your local AI keeps all conversations completely private on your device. No data is ever sent to external servers." :
-                         "When using online AI, your messages are sent to secure servers for processing. Your conversation history remains private and is not used for training.")
+                    Text("When using online AI, your messages are sent to secure servers for processing. Your conversation history remains private and is not used for training.")
                         .font(.caption)
                         .foregroundColor(.secondary)
                         .multilineTextAlignment(.center)
@@ -128,7 +91,7 @@ struct OnlineAIConfirmationView: View {
                         .fixedSize(horizontal: false, vertical: true)
                 }
                 .padding()
-                .background((hybridManager.isUsingCloudAI ? Color.green : Color.blue).opacity(0.1))
+                .background(Color.blue.opacity(0.1))
                 .clipShape(RoundedRectangle(cornerRadius: 12))
                 .padding(.horizontal)
                 
@@ -136,32 +99,30 @@ struct OnlineAIConfirmationView: View {
                 
                 // Action Buttons
                 VStack(spacing: 12) {
-                    Button(action: hybridManager.isUsingCloudAI ? switchToLocalAI : enableOnlineAI) {
+                    Button(action: enableOnlineAI) {
                         HStack {
                             if isEnabling {
                                 ProgressView()
                                     .scaleEffect(0.8)
                                     .foregroundColor(.white)
                             } else {
-                                Image(systemName: hybridManager.isUsingCloudAI ? "sparkles" : "sparkles")
+                                Image(systemName: "sparkles")
                                     .font(.system(size: 16, weight: .medium))
                             }
                             
-                            Text(isEnabling ? 
-                                 (hybridManager.isUsingCloudAI ? "Switching..." : "Enabling...") :
-                                 (hybridManager.isUsingCloudAI ? "Switch to Local AI" : "Enable Online AI"))
+                            Text(isEnabling ? "Enabling..." : "Enable Online AI")
                                 .font(.headline)
                                 .fontWeight(.semibold)
                         }
                         .foregroundColor(.white)
                         .frame(maxWidth: .infinity)
                         .padding()
-                        .background(hybridManager.isUsingCloudAI ? Color.green : Color.brandBlue)
+                        .background(Color.brandBlue)
                         .clipShape(RoundedRectangle(cornerRadius: 12))
                     }
                     .disabled(isEnabling)
                     
-                    Button(hybridManager.isUsingCloudAI ? "Keep Using Online AI" : "Keep Using Local AI") {
+                    Button("Not Now") {
                         dismiss()
                     }
                     .font(.body)
@@ -187,19 +148,6 @@ struct OnlineAIConfirmationView: View {
         
         Task {
             await hybridManager.switchToCloudAI()
-            
-            await MainActor.run {
-                isEnabling = false
-                dismiss()
-            }
-        }
-    }
-    
-    private func switchToLocalAI() {
-        isEnabling = true
-        
-        Task {
-            await hybridManager.switchToLocalAI()
             
             await MainActor.run {
                 isEnabling = false
