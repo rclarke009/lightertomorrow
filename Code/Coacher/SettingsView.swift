@@ -7,6 +7,7 @@
 
 import SwiftUI
 import SwiftData
+import SafariServices
 
 struct SettingsView: View {
     @Environment(\.modelContext) private var context
@@ -24,8 +25,9 @@ struct SettingsView: View {
     @AppStorage("morningFocusReminder") private var morningFocusReminder = true
     @State private var nightPrepTime: Date = Date()
     @State private var morningFocusTime: Date = Date()
-    @State private var showAdvancedAISettings = false
     @State private var showWidgetGuide = false
+    @State private var safariURL: URL?
+    @State private var showSafari = false
     
     var body: some View {
         NavigationView {
@@ -34,17 +36,9 @@ struct SettingsView: View {
                 
                 widgetSection
                 
-                aiCoachComingSoonSection
-                
                 personalizationSection
                 
-                aiConfigurationSection
-                
                 gamificationSection
-                
-                aiCoachModelSection
-                
-                dataPrivacySection
                 
                 aboutSection
                 
@@ -78,6 +72,12 @@ struct SettingsView: View {
                 .onAppear {
                     print("🔄 DEBUG: OnboardingView fullScreenCover appeared")
                 }
+        }
+        .sheet(isPresented: $showSafari) {
+            if let url = safariURL {
+                SafariView(url: url)
+                    .ignoresSafeArea()
+            }
         }
     }
     
@@ -121,35 +121,20 @@ struct SettingsView: View {
         Section(header: Text("Home Screen Widget")) {
                     Button(action: { showWidgetGuide = true }) {
                         HStack {
+                            let accentColor: Color = colorScheme == .dark ? .white : .blue
+                            
                             Image(systemName: "square.grid.2x2")
-                                .foregroundColor(.blue)
+                                .foregroundColor(accentColor)
                             Text("How to Add Widget")
+                                .foregroundColor(accentColor)
                             Spacer()
                             Image(systemName: "chevron.right")
                                 .foregroundColor(.secondary)
                         }
                     }
-                    .foregroundColor(.primary)
                     .accessibilityLabel("How to add widget")
                     .accessibilityHint("Opens guide for adding home screen widget")
                 }
-    }
-    
-    private var aiCoachComingSoonSection: some View {
-        Section("AI Coach") {
-            VStack(alignment: .leading, spacing: 8) {
-                HStack {
-                    Image(systemName: "brain.head.profile")
-                        .foregroundColor(.blue)
-                    Text("Coming Soon")
-                        .font(.headline)
-                }
-                Text("Your AI coach will be available soon to help guide you on your wellness journey.")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-            }
-            .padding(.vertical, 4)
-        }
     }
     
     private var personalizationSection: some View {
@@ -182,69 +167,6 @@ struct SettingsView: View {
                 }
     }
     
-    private var aiConfigurationSection: some View {
-        Section {
-                    Button(action: {
-                        showAdvancedAISettings.toggle()
-                    }) {
-                        HStack {
-                            Text("Advanced AI Settings")
-                                .foregroundColor(colorScheme == .dark ? .white : .primary)
-                            Spacer()
-                            Image(systemName: showAdvancedAISettings ? "chevron.down" : "chevron.right")
-                                .foregroundColor(.secondary)
-                                .font(.caption)
-                        }
-                    }
-                    .buttonStyle(PlainButtonStyle())
-                    
-                    if showAdvancedAISettings {
-                        VStack(alignment: .leading, spacing: 12) {
-                            HStack {
-                                Text("OpenAI API Key")
-                                Spacer()
-                                TextField("sk-...", text: Binding(
-                                    get: { KeychainManager.shared.getOpenAIKey() ?? "" },
-                                    set: { 
-                                        if $0.isEmpty {
-                                            _ = KeychainManager.shared.deleteOpenAIKey()
-                                        } else {
-                                            _ = KeychainManager.shared.storeOpenAIKey($0)
-                                        }
-                                    }
-                                ))
-                                .multilineTextAlignment(.trailing)
-                                .foregroundColor(colorScheme == .dark ? .white : .secondary)
-                                .background(colorScheme == .dark ? Color.darkTextInputBackground : Color.clear)
-                                .accessibilityLabel("OpenAI API Key")
-                                .accessibilityHint("Enter your OpenAI API key for enhanced AI features")
-                            }
-                            
-                            if useCloudAI {
-                                HStack {
-                                    Image(systemName: "checkmark.circle.fill")
-                                        .foregroundColor(.green)
-                                    Text("Online AI enabled")
-                                        .font(.caption)
-                                        .foregroundColor(.secondary)
-                                }
-                            } else {
-                                HStack {
-                                    Image(systemName: "info.circle")
-                                        .foregroundColor(.blue)
-                                    Text("Add API key to enable online AI features")
-                                        .font(.caption)
-                                        .foregroundColor(.secondary)
-                                }
-                            }
-                        }
-                        .padding(.vertical, 4)
-                    }
-                } header: {
-                    Text("AI Configuration")
-                }
-    }
-    
     private var gamificationSection: some View {
         Section("Gamification") {
                     Toggle("Show animations", isOn: $celebrationManager.animationsEnabled)
@@ -267,88 +189,33 @@ struct SettingsView: View {
                 }
     }
     
-    private var aiCoachModelSection: some View {
-        Section("AI Coach") {
-                    HStack {
-                        Text("Model Status")
-                        Spacer()
-                        Text(mlcManager.modelStatus)
-                            .foregroundStyle(.secondary)
-                    }
-                    
-                    if mlcManager.isModelLoaded {
-                        HStack {
-                            Text("Model")
-                            Spacer()
-                            Text("Llama-2-7B")
-                                .foregroundStyle(.secondary)
-                        }
-                        
-                        HStack {
-                            Text("Quantization")
-                            Spacer()
-                            Text("Q4F16")
-                                .foregroundStyle(.secondary)
-                        }
-                    }
-                    
-                    if !mlcManager.isModelLoaded && !mlcManager.isLoading {
-                        Button("Load Model") {
-                            Task {
-                                await mlcManager.loadModel()
-                            }
-                        }
-                        .foregroundColor(.brandBlue)
-                    }
-                    
-                    if mlcManager.errorMessage != nil {
-                        Text(mlcManager.errorMessage ?? "")
-                            .foregroundStyle(.red)
-                            .font(.caption)
-                    }
-                }
-    }
-    
-    private var dataPrivacySection: some View {
-        Section("Data & Privacy") {
-                    Button("Export data") {
-                        exportData()
-                    }
-                    .foregroundColor(.leafGreen)
-                    
-                    Button("Import data") {
-                        importData()
-                    }
-                    .foregroundColor(.leafYellow)
-                    
-                    Button("Clear all data") {
-                        clearAllData()
-                    }
-                    .foregroundStyle(.red)
-                }
-    }
-    
     private var aboutSection: some View {
         Section("About") {
                     HStack {
                         Text("Version")
                         Spacer()
-                        Text("2.0.0")
+                        Text(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "—")
                             .foregroundStyle(.secondary)
                     }
                     
                     HStack {
                         Text("Build")
                         Spacer()
-                        Text("1")
+                        Text(Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "—")
                             .foregroundStyle(.secondary)
                     }
                     
-                    Link("Privacy Policy", destination: URL(string: "https://www.lightertomorrow.com/public/privacy-policy.html")!)
-                        .foregroundColor(.brandBlue)
+                    Button("Privacy Policy") {
+                        safariURL = URL(string: "https://www.lightertomorrow.com/public/privacy-policy.html")
+                        showSafari = safariURL != nil
+                    }
+                    .foregroundColor(colorScheme == .dark ? .white : .brandBlue)
                     
-                    Link("Terms of Service", destination: URL(string: "https://www.lightertomorrow.com/public/terms-of-service.html")!)
-                        .foregroundColor(.brandBlue)
+                    Button("Terms of Service") {
+                        safariURL = URL(string: "https://www.lightertomorrow.com/public/terms-of-service.html")
+                        showSafari = safariURL != nil
+                    }
+                    .foregroundColor(colorScheme == .dark ? .white : .brandBlue)
                 }
     }
     
@@ -410,6 +277,20 @@ struct SettingsView: View {
     private func hideKeyboard() {
         UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
     }
+}
+
+// MARK: - Safari View
+
+private struct SafariView: UIViewControllerRepresentable {
+    let url: URL
+
+    func makeUIViewController(context: Context) -> SFSafariViewController {
+        let controller = SFSafariViewController(url: url)
+        controller.preferredControlTintColor = UIColor(Color.brandBlue)
+        return controller
+    }
+
+    func updateUIViewController(_ uiViewController: SFSafariViewController, context: Context) {}
 }
 
 #Preview {

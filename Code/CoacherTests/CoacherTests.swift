@@ -6,7 +6,8 @@
 //
 
 import Testing
-@testable import Coacher
+@testable import Lighter_Tomorrow
+
 
 struct CoacherTests {
 
