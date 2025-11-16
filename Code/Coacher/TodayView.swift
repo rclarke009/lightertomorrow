@@ -153,10 +153,12 @@ struct TodayView: View {
                 checkMorningCompletionToday()
             }
             .onReceive(NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)) { _ in
+                // Refresh time manager phase when app becomes active
+                timeManager.updatePhase()
                 // Refresh data when app becomes active to show current day's data
                 loadOrCreateToday()
                 checkMorningCompletionToday() // Refresh morning completion status when app becomes active
-                // Don't reset expansion states - only reset on actual app launch
+                setDefaultExpansionStates() // Reset expansion states based on current time of day
             }
 
             .sheet(isPresented: $showingNeedHelp) {

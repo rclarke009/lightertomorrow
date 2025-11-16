@@ -140,7 +140,7 @@ struct CoachView: View {
                                     VStack(spacing: 20) {
                                         Image(systemName: "brain.head.profile")
                                             .font(.system(size: 60))
-                                            .foregroundColor(.brandBlue)
+                                            .foregroundColor(colorScheme == .dark ? Color.brightBlue : Color.brandBlue)
                                         
                                         Text("AI Coach")
                                             .font(.largeTitle)
@@ -302,7 +302,7 @@ struct CoachView: View {
                 VStack(spacing: 20) {
                     Image(systemName: "brain.head.profile")
                         .font(.system(size: 60))
-                        .foregroundColor(.blue)
+                        .foregroundColor(colorScheme == .dark ? Color.brightBlue : Color.brandBlue)
                     
                     Text("AI Coach")
                         .font(.largeTitle)

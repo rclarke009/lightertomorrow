@@ -12,7 +12,7 @@ struct WidgetInstallationGuideView: View {
     @Environment(\.colorScheme) private var colorScheme
     
     var body: some View {
-        NavigationView {
+        NavigationStack {
             ScrollView {
                 VStack(spacing: 24) {
                     // Header
@@ -70,13 +70,13 @@ struct WidgetInstallationGuideView: View {
             .navigationTitle("Widget Guide")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                       ToolbarItem(placement: .navigationBarTrailing) {
-                           Button("Done") {
-                               dismiss()
-                           }
-                           .accessibilityLabel("Done")
-                           .accessibilityHint("Closes widget installation guide")
-                       }
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Done") {
+                        dismiss()
+                    }
+                    .accessibilityLabel("Done")
+                    .accessibilityHint("Closes widget installation guide")
+                }
             }
         }
     }

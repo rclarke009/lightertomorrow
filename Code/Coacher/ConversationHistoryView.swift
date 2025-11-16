@@ -322,7 +322,7 @@ struct ConversationRow: View {
             HStack {
                 Text(group.dateString)
                     .font(.headline)
-                    .foregroundColor(.primary)
+                    .foregroundColor(Color.primaryText)
                 
                 Spacer()
                 

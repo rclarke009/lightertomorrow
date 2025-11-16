@@ -66,6 +66,14 @@ class ReminderManager: ObservableObject {
     }
     
     private func scheduleNightPrepReminder() async {
+        // Check if night prep has already been completed today
+        let today = Calendar.current.startOfDay(for: Date())
+        if let savedDate = UserDefaults.standard.object(forKey: "nightPrepCompletedDate") as? Date,
+           Calendar.current.isDate(savedDate, inSameDayAs: today) {
+            // Night prep already completed today, don't schedule reminder
+            return
+        }
+        
         let center = UNUserNotificationCenter.current()
         
         let content = UNMutableNotificationContent()
@@ -109,6 +117,14 @@ class ReminderManager: ObservableObject {
     }
     
     private func scheduleMorningFocusReminder() async {
+        // Check if morning flow has already been completed today
+        let today = Calendar.current.startOfDay(for: Date())
+        if let savedDate = UserDefaults.standard.object(forKey: "morningCompletedDate") as? Date,
+           Calendar.current.isDate(savedDate, inSameDayAs: today) {
+            // Morning flow already completed today, don't schedule reminder
+            return
+        }
+        
         let center = UNUserNotificationCenter.current()
         
         let content = UNMutableNotificationContent()

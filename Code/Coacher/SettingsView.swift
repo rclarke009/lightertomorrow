@@ -27,7 +27,7 @@ struct SettingsView: View {
     @State private var showWidgetGuide = false
     
     var body: some View {
-        NavigationView {
+        NavigationStack {
             List {
                 remindersSection
                 
@@ -54,15 +54,17 @@ struct SettingsView: View {
             .onAppear {
                 loadSavedTimes()
             }
-            .sheet(isPresented: $showWidgetGuide) {
-                WidgetInstallationGuideView()
-            }
             .onChange(of: nightPrepTime) { _, newValue in
                 UserDefaults.standard.set(newValue, forKey: "nightPrepTime")
             }
             .onChange(of: morningFocusTime) { _, newValue in
                 UserDefaults.standard.set(newValue, forKey: "morningFocusTime")
             }
+        }
+        .sheet(isPresented: $showWidgetGuide) {
+            WidgetInstallationGuideView()
+                .presentationDetents([.medium, .large])
+                .presentationDragIndicator(.visible)
         }
         .fullScreenCover(isPresented: $showOnboarding) {
             OnboardingView(isPresented: $showOnboarding)
@@ -123,6 +125,7 @@ struct SettingsView: View {
                                 .foregroundColor(.secondary)
                         }
                     }
+                    .buttonStyle(.plain)
                     .accessibilityLabel("How to add widget")
                     .accessibilityHint("Opens guide for adding home screen widget")
                 }

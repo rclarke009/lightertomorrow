@@ -23,7 +23,7 @@ class TimeManager: ObservableObject {
         }
     }
     
-    private func updatePhase() {
+    func updatePhase() {
         let hour = Calendar.current.component(.hour, from: Date())
         currentPhase = hour >= 18 ? .evening : .day
     }

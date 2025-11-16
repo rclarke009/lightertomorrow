@@ -54,7 +54,7 @@ struct OnboardingView: View {
         
         OnboardingPage(
             title: "Your AI Coach",
-            subtitle: "Coming Soon",
+            subtitle: "Compassionate coaching, anytime.",
             content: "Your AI coach will help guide you on your wellness journey with personalized support and encouragement.",
             icon: "brain.head.profile",
             color: .blue

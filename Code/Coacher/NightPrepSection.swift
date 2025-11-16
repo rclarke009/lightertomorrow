@@ -366,6 +366,9 @@ struct NightPrepSection: View {
         
         // If any items are completed, cancel today's reminder and reschedule for tomorrow
         if hasCompletedItems {
+            // Mark night prep as completed today
+            UserDefaults.standard.set(Date(), forKey: "nightPrepCompletedDate")
+            
             reminderManager.cancelNightPrepReminder()
             // Reschedule the reminder for tomorrow since user completed prep early
             Task {
