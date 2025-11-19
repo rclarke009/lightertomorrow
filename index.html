@@ -88,6 +88,14 @@
     .foot{padding:36px 0; color:var(--muted); font-size:14px}
     .foot .links{display:flex; gap:16px; flex-wrap:wrap}
 
+    /* VIDEO STYLING */
+    video {
+      width: 100%;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      display: block;
+    }
+
     /* responsive */
     @media (max-width: 960px){ .hero-grid{grid-template-columns:1fr} }
     @media (max-width: 720px){ .grid-3{grid-template-columns:1fr} }
@@ -124,7 +132,11 @@
         </div>
 
         <div class="hero-card" aria-label="App preview">
-          <img src="images/lighter-tomorrow-weightloss-coach-app-welcome.png" alt="Lighter Tomorrow App Welcome Screen" style="width:100%; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.1);">
+          <video autoplay loop muted playsinline style="width:100%; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.1);">
+            <source src="images/morning-flow.mp4" type="video/mp4">
+            <source src="images/morning-flow.mov" type="video/quicktime">
+            Your browser does not support the video tag.
+          </video>
           <p class="muted" style="margin:12px 2px 0">Start your journey with gentle guidance and celebrate every small win along the way ✨</p>
         </div>
       </div>
