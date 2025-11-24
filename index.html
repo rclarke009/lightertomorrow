@@ -96,6 +96,49 @@
       display: block;
     }
 
+    /* PHONE FRAME STYLING */
+    .phone-frame {
+      background: #1a1a1a;
+      border-radius: 32px;
+      padding: 12px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.1) inset;
+      position: relative;
+      max-width: 320px;
+      margin: 0 auto;
+      aspect-ratio: 9 / 19.5;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .phone-frame::before {
+      content: '';
+      position: absolute;
+      top: 8px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 120px;
+      height: 24px;
+      background: #1a1a1a;
+      border-radius: 0 0 16px 16px;
+      z-index: 1;
+    }
+    .phone-frame video {
+      border-radius: 24px;
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      position: relative;
+      z-index: 0;
+    }
+
+    /* RESPECT REDUCED MOTION PREFERENCE */
+    @media (prefers-reduced-motion: reduce) {
+      .phone-frame video {
+        animation: none;
+      }
+    }
+
     /* responsive */
     @media (max-width: 960px){ .hero-grid{grid-template-columns:1fr} }
     @media (max-width: 720px){ .grid-3{grid-template-columns:1fr} }
@@ -132,10 +175,12 @@
         </div>
 
         <div class="hero-card" aria-label="App preview">
-          <video autoplay loop muted playsinline style="width:100%; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.1);">
-            <source src="images/morning-flow.mp4" type="video/mp4">
-            Your browser does not support the video tag.
-          </video>
+          <div class="phone-frame">
+            <video id="morning-video" autoplay muted playsinline>
+              <source src="images/morning-flow.mp4" type="video/mp4">
+              Your browser does not support the video tag.
+            </video>
+          </div>
           <p class="muted" style="margin:12px 2px 0">Start your journey with gentle guidance and celebrate every small win along the way ✨</p>
         </div>
       </div>
@@ -145,7 +190,7 @@
     <section>
       <div class="wrap grid-3">
         <div class="card">
-          <h3>Nightly prep in 60s</h3>
+          <h3>Nightly prep in 60 seconds</h3>
           <p class="muted">Pick one easy swap for tomorrow (e.g., water before coffee). Decide once—avoid decision fatigue.</p>
         </div>
         <div class="card">
@@ -185,6 +230,25 @@
               <p class="muted">Enjoy a celebration. Watch your streak grow and feel the progress.</p>
             </div>
           </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- EVENING CHECKIN VIDEO -->
+    <section>
+      <div class="wrap hero-grid">
+        <div>
+          <h2>Your evening checkin</h2>
+          <p class="muted" style="margin:12px 0 0">Take 60 seconds each night to set yourself up for success tomorrow. Choose one simple swap and wake up already decided—no decision fatigue, just progress.</p>
+        </div>
+        <div class="hero-card" aria-label="Evening checkin preview">
+          <div class="phone-frame">
+            <video id="evening-video" autoplay muted playsinline>
+              <source src="images/evening-flow.mp4" type="video/mp4">
+              Your browser does not support the video tag.
+            </video>
+          </div>
+          <p class="muted" style="margin:12px 2px 0">End your day with intention and prepare for a calmer tomorrow 🌙</p>
         </div>
       </div>
     </section>
@@ -313,6 +377,59 @@
   <script>
     // Set current year
     document.getElementById('year').textContent = new Date().getFullYear();
+    
+    // Check for reduced motion preference
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    
+    // Video replay with 15-second delay
+    function setupVideoReplay(videoId, delaySeconds = 15) {
+      const video = document.getElementById(videoId);
+      if (!video) return;
+      
+      // If user prefers reduced motion, don't autoplay or loop
+      if (prefersReducedMotion) {
+        video.removeAttribute('autoplay');
+        video.pause();
+        // Add a play button or make it clickable
+        video.style.cursor = 'pointer';
+        video.setAttribute('aria-label', 'Click to play video');
+        video.addEventListener('click', function() {
+          if (video.paused) {
+            video.play();
+          } else {
+            video.pause();
+          }
+        });
+        return; // Exit early, no auto-replay
+      }
+      
+      let replayTimeout;
+      
+      video.addEventListener('ended', function() {
+        // Clear any existing timeout
+        if (replayTimeout) {
+          clearTimeout(replayTimeout);
+        }
+        
+        // Set timeout to replay after delay
+        replayTimeout = setTimeout(function() {
+          video.currentTime = 0;
+          video.play();
+        }, delaySeconds * 1000);
+      });
+      
+      // Ensure video plays on load (only if motion is allowed)
+      video.addEventListener('loadeddata', function() {
+        video.play().catch(function(error) {
+          console.log('Autoplay prevented:', error);
+        });
+      });
+    }
+    
+    // Setup replay for both videos
+    setupVideoReplay('morning-video', 15);
+    setupVideoReplay('evening-video', 15);
+    
     // Fake subscribe handler
     async function handleMailerLiteSubmit(event) {
       event.preventDefault();
